@@ -2,17 +2,20 @@ import React, { useState } from "react";
 import LeftArrowIcon from "../../assets/icons/pricingpage/LeftArrowIcon";
 import PersonalScreen from "../PricingPages/PersonalScreen";
 import EnterpriseScreen from "../PricingPages/EnterpriseScreen";
+import { Link } from "react-router-dom";
 
 const PricingPage = () => {
   const [active, setActive] = useState("personal");
 
   return (
-    <div className="w-full px-6 py-10 relative">
+    <div className="w-full py-10 relative">
 
       {/* LEFT ARROW */}
-      <button className="absolute left-3 md:left-10 xl:left-30 top-14">
+      <Link 
+      to='/'
+      className="absolute left-3 md:left-10 xl:left-30 top-14">
         <LeftArrowIcon width={20} height={20} />
-      </button>
+      </Link>
 
       <div className="flex  justify-center">
         {/* TOGGLE + ARROW */}

@@ -5,21 +5,20 @@ import CloseIcon from '../../assets/icons/loginpages/CloseIcon';
 import PdfIcon from '../../assets/icons/uploadpage/PdfIcon';
 import TrashIcon from '../../assets/icons/accountpage/TrashIcon';
 import EditIcon from '../../assets/icons/accountpage/EditIcon';
-import CsvIcon from '../../assets/icons/uploadpage/CsvIcon';
-import ExcelIcon from '../../assets/icons/uploadpage/ExcelIcon';
 import PngIcon from '../../assets/icons/uploadpage/PngIcon';
-import TiffIcon from '../../assets/icons/uploadpage/TiffIcon';
-import UploadCloudIcon from '../../assets/icons/uploadpage/UploadCloudIcon';
-import EyeIcon from '../../assets/icons/loginpages/EyeIcon';
 import LeftPaginationArrowIcon from '../../assets/icons/uploadpage/LeftPaginationArrowIcon';
 import DiagonalSlashIcon from '../../assets/icons/uploadpage/DiagonalSlashIcon';
 import RightArrowIcon from '../../assets/icons/uploadpage/RightArrowIcon';
 import SearchMinusIcon from '../../assets/icons/uploadpage/SearchMinusIcon';
 import SearchAddIcon from '../../assets/icons/uploadpage/SearchAddIcon';
-import TextIcon from '../../assets/icons/uploadpage/TextIcon';
-import RefreshRotateIcon from '../../assets/icons/uploadpage/RefreshRotateIcon';
+import ExportSuccessfulPopup from '../ocrpopups/ExportSuccessfulPopup';
+import WebpIcon from '../../assets/icons/uploadpage/WebpIcon';
+import JpgIcon from '../../assets/icons/uploadpage/JpgIcon';
+import JpegIcon from '../../assets/icons/uploadpage/JpegIcon';
+import SvgIcon from '../../assets/icons/uploadpage/SvgIcon';
 
 const OriginalExtractPage = () => {
+    const [showExportPopup, setShowExportPopup] = useState(false);
     const [open, setOpen] = useState(false);
     return (
         <div className="bg-white p-4 sm:p-6 md:p-8 lg:p-10">
@@ -35,58 +34,68 @@ const OriginalExtractPage = () => {
             </div>
 
             {/* Off-canvas Sidebar */}
-            <div className={`fixed top-0 left-0 h-full w-[280px] sm:w-[300px] md:w-[350px] bg-[#E2E9F0] z-50 shadow-xl transform transition-transform duration-300 ${open ? "translate-x-0" : "-translate-x-full"}`}>
-                <div className='absolute top-4 sm:top-5 right-4 sm:right-5 cursor-pointer' onClick={() => setOpen(false)}>
-                    <CloseIcon width={20} height={20} sm:width={24} sm:height={24} color='#000000' />
+            <div className={`fixed top-0 left-0 h-full w-[300px] md:w-[350px] bg-[#E2E9F0] z-50 shadow-xl transform transition-transform duration-300 ${open ? "translate-x-0" : "-translate-x-full"}`}>
+                <div className='absolute top-5 right-5 cursor-pointer' onClick={() => setOpen(false)}>
+                    <CloseIcon width={24} height={24} color='#000000' />
                 </div>
-                <div className='pt-16 sm:pt-20 flex justify-between items-center px-3 sm:px-4 py-3 bg-[#D6E0EA] border-b border-[#6E6B6B]/25'>
-                    <div className='flex justify-center items-center gap-3 sm:gap-4'>
-                        <PdfIcon width={20} height={20} sm:width={24} sm:height={24} />
-                        <div className='font-avenir font-bold text-[14px] sm:text-[16px] leading-[100%] text-[#000000]'>File.pdf</div>
+                <div className='pt-20 flex justify-between items-center px-4 py-3 bg-[#D6E0EA] border-b border-[#6E6B6B]/25'>
+                    <div className='flex justify-center items-center gap-4'>
+                        <WebpIcon width={24} height={24} />
+                        <div className='font-avenir font-bold text-[16px] leading-[100%] text-[#000000]'>File.webp</div>
                     </div>
-                    <div className='flex justify-center items-center gap-3 sm:gap-4'>
-                        <TrashIcon width={18} height={18} sm:width={20} sm:height={20} color='#21527D' />
-                        <EditIcon width={18} height={18} sm:width={20} sm:height={20} color='#21527D' />
-                    </div>
-                </div>
-                <div className='flex justify-between items-center px-3 sm:px-4 py-3 bg-[#E4EBF2] border-b border-[#6E6B6B]/25'>
-                    <div className='flex justify-center items-center gap-3 sm:gap-4'>
-                        <CsvIcon width={20} height={20} sm:width={24} sm:height={24} />
-                        <div className='font-avenir font-bold text-[14px] sm:text-[16px] leading-[100%] text-[#000000]'>File.csv</div>
-                    </div>
-                    <div className='flex justify-center items-center gap-3 sm:gap-4'>
-                        <TrashIcon width={18} height={18} sm:width={20} sm:height={20} color='#21527D' />
-                        <EditIcon width={18} height={18} sm:width={20} sm:height={20} color='#21527D' />
+                    <div className='flex justify-center items-center gap-4'>
+                        <TrashIcon width={20} height={20} color='#21527D' />
+                        <EditIcon width={20} height={20} color='#21527D' />
                     </div>
                 </div>
-                <div className='flex justify-between items-center px-3 sm:px-4 py-3 bg-[#D6E0EA] border-b border-[#6E6B6B]/25'>
-                    <div className='flex justify-center items-center gap-3 sm:gap-4'>
-                        <ExcelIcon width={20} height={20} sm:width={24} sm:height={24} />
-                        <div className='font-avenir font-bold text-[14px] sm:text-[16px] leading-[100%] text-[#000000]'>File.xlsx</div>
+                <div className='flex justify-between items-center px-4 py-3 bg-[#E4EBF2] border-b border-[#6E6B6B]/25'>
+                    <div className='flex justify-center items-center gap-4'>
+                        <PngIcon width={24} height={24} />
+                        <div className='font-avenir font-bold text-[16px] leading-[100%] text-[#000000]'>File.png</div>
                     </div>
-                    <div className='flex justify-center items-center gap-3 sm:gap-4'>
-                        <TrashIcon width={18} height={18} sm:width={20} sm:height={20} color='#21527D' />
-                        <EditIcon width={18} height={18} sm:width={20} sm:height={20} color='#21527D' />
-                    </div>
-                </div>
-                <div className='flex justify-between items-center px-3 sm:px-4 py-3 bg-[#E4EBF2] border-b border-[#6E6B6B]/25'>
-                    <div className='flex justify-center items-center gap-3 sm:gap-4'>
-                        <PngIcon width={20} height={20} sm:width={24} sm:height={24} />
-                        <div className='font-avenir font-bold text-[14px] sm:text-[16px] leading-[100%] text-[#000000]'>File.png</div>
-                    </div>
-                    <div className='flex justify-center items-center gap-3 sm:gap-4'>
-                        <TrashIcon width={18} height={18} sm:width={20} sm:height={20} color='#21527D' />
-                        <EditIcon width={18} height={18} sm:width={20} sm:height={20} color='#21527D' />
+                    <div className='flex justify-center items-center gap-4'>
+                        <TrashIcon width={20} height={20} color='#21527D' />
+                        <EditIcon width={20} height={20} color='#21527D' />
                     </div>
                 </div>
-                <div className='flex justify-between items-center px-3 sm:px-4 py-3 bg-[#D6E0EA] border-b border-[#6E6B6B]/25'>
-                    <div className='flex justify-center items-center gap-3 sm:gap-4'>
-                        <TiffIcon width={20} height={20} sm:width={24} sm:height={24} />
-                        <div className='font-avenir font-bold text-[14px] sm:text-[16px] leading-[100%] text-[#000000]'>File.tiff</div>
+                <div className='flex justify-between items-center px-4 py-3 bg-[#D6E0EA] border-b border-[#6E6B6B]/25'>
+                    <div className='flex justify-center items-center gap-4'>
+                        <JpgIcon width={24} height={24} />
+                        <div className='font-avenir font-bold text-[16px] leading-[100%] text-[#000000]'>File.jpg</div>
                     </div>
-                    <div className='flex justify-center items-center gap-3 sm:gap-4'>
-                        <TrashIcon width={18} height={18} sm:width={20} sm:height={20} color='#21527D' />
-                        <EditIcon width={18} height={18} sm:width={20} sm:height={20} color='#21527D' />
+                    <div className='flex justify-center items-center gap-4'>
+                        <TrashIcon width={20} height={20} color='#21527D' />
+                        <EditIcon width={20} height={20} color='#21527D' />
+                    </div>
+                </div>
+                <div className='flex justify-between items-center px-4 py-3 bg-[#E4EBF2] border-b border-[#6E6B6B]/25'>
+                    <div className='flex justify-center items-center gap-4'>
+                        <JpegIcon width={24} height={24} />
+                        <div className='font-avenir font-bold text-[16px] leading-[100%] text-[#000000]'>File.Jpeg</div>
+                    </div>
+                    <div className='flex justify-center items-center gap-4'>
+                        <TrashIcon width={20} height={20} color='#21527D' />
+                        <EditIcon width={20} height={20} color='#21527D' />
+                    </div>
+                </div>
+                <div className='flex justify-between items-center px-4 py-3 bg-[#D6E0EA] border-b border-[#6E6B6B]/25'>
+                    <div className='flex justify-center items-center gap-4'>
+                        <SvgIcon width={24} height={24} />
+                        <div className='font-avenir font-bold text-[16px] leading-[100%] text-[#000000]'>File.svg</div>
+                    </div>
+                    <div className='flex justify-center items-center gap-4'>
+                        <TrashIcon width={20} height={20} color='#21527D' />
+                        <EditIcon width={20} height={20} color='#21527D' />
+                    </div>
+                </div>
+                <div className='flex justify-between items-center px-4 py-3 bg-[#D6E0EA] border-b border-[#6E6B6B]/25'>
+                    <div className='flex justify-center items-center gap-4'>
+                        <PdfIcon width={24} height={24} opacity={0.7} />
+                        <div className='font-avenir font-bold text-[16px] leading-[100%] text-[#000000]'>File.pdf</div>
+                    </div>
+                    <div className='flex justify-center items-center gap-4'>
+                        <TrashIcon width={20} height={20} color='#21527D' />
+                        <EditIcon width={20} height={20} color='#21527D' />
                     </div>
                 </div>
             </div>
@@ -113,7 +122,7 @@ const OriginalExtractPage = () => {
                         </div>
 
                         {/* Main Display Box */}
-                        <div className="w-full max-w-full h-[350px] lg:h-[400px] xl:h-[450px] rounded-[20px] sm:rounded-[25px] bg-[#FDFDFD] shadow-[0px_-2px_4px_0px_#21527D1A] p-3 sm:p-4 flex items-center justify-center">
+                        <div className="w-full max-w-[400px] lg:max-w-full xl:max-w-[450px] h-[300px] md:h-[500px] rounded-[25px] bg-[#FDFDFD] shadow-[0px_-2px_4px_0px_#21527D1A] p-4 flex items-center justify-center">
                             <PngIcon width={120} height={120} opacity={0.2} />
                         </div>
                     </div>
@@ -167,7 +176,7 @@ const OriginalExtractPage = () => {
                         </div>
 
                         {/* Main Display Box */}
-                        <div className="w-full max-w-full h-[350px] lg:h-[400px] xl:h-[450px] rounded-[20px] sm:rounded-[25px] bg-[#FDFDFD] shadow-[0px_-2px_4px_0px_#21527D1A] p-3 sm:p-4 overflow-auto">
+                        <div className="scrollbar-hide w-full max-w-[400px] lg:max-w-full xl:max-w-[450px] h-[300px] md:h-[500px] rounded-[25px] bg-[#FDFDFD] shadow-[0px_-2px_4px_0px_#21527D1A] p-4 overflow-auto">
                             <p className="font-avenir text-[14px] sm:text-[16px] leading-relaxed text-gray-700">
                                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum quaerat qui voluptate recusandae omnis repellat facilis, maxime et, temporibus aut delectus. Debitis quas, nostrum quae eveniet ea, dolorum repudiandae suscipit et esse dignissimos omnis maxime reprehenderit tempore at dolores. Excepturi repellat pariatur minima dignissimos nobis velit tenetur saepe similique dolor!
                             </p>
@@ -204,36 +213,44 @@ const OriginalExtractPage = () => {
             {/* Bottom Navigation */}
             <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 mt-4 sm:mt-6 md:mt-8 justify-between px-0 md:px-10 xl:px-30">
                 {/* Previous Button */}
-                <button className="order-2 sm:order-1 font-avenir font-black text-[14px] sm:text-[16px] leading-[100%] text-[#21527D] bg-[#E7EDF2] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-auto min-w-[120px] sm:min-w-[200px] md:min-w-[240px] lg:min-w-[260px] h-[45px] sm:h-[50px] md:h-[55px] rounded-[12px] sm:rounded-[15px] flex items-center justify-center hover:opacity-90 transition-opacity">
+                <button className="order-2 sm:order-1 font-avenir font-bold lg:font-black text-[14px] sm:text-[16px] leading-[100%] text-[#21527D] bg-[#E7EDF2] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-auto min-w-[120px] sm:min-w-[200px] lg:min-w-[240px] lg:min-w-[260px] h-[45px] sm:h-[50px] md:h-[55px] rounded-[12px] sm:rounded-[15px] flex items-center justify-center hover:opacity-90 transition-opacity">
                     Previous
                 </button>
 
                 {/* Pagination Center */}
-                <div className='order-1 sm:order-2 flex flex-col sm:flex-row items-center gap-3 sm:gap-4 md:gap-5'>
-                    <h2 className='font-avenir font-semibold text-[18px] sm:text-[20px] md:text-[22px] lg:text-[24px] leading-[100%] text-[#21527D] opacity-[0.72] text-center sm:text-left'>
+                <div className='order-1 sm:order-2 flex flex-col lg:flex-row items-center gap-3 lg:gap-5'>
+                    <h2 className='font-avenir font-semibold text-[18px] sm:text-[20px] lg:text-[24px] leading-[100%] text-[#21527D] opacity-[0.72] text-center sm:text-left'>
                         Select a File
                     </h2>
                     <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4">
-                        <div className='w-[50px] h-[50px] bg-[#21527D] flex justify-center items-center rounded-[100%]'>
-                            <LeftPaginationArrowIcon width={10} height={10} color='#FDFDFD'/>
+                        <div className='w-[30px] lg:w-[50px] h-[30px] lg:h-[50px] bg-[#21527D] flex justify-center items-center rounded-[100%]'>
+                            <LeftPaginationArrowIcon width={10} height={10} color='#FDFDFD' />
                         </div>
-                        <div className="w-[22px] h-[22px] sm:w-[25px] sm:h-[25px] flex items-center justify-center rounded-[6px] sm:rounded-[8px] bg-[#DEE8F2] font-avenir font-semibold text-[16px] sm:text-[18px] md:text-[20px] leading-[100%] text-[#000000] opacity-[0.72]">
+                        <div className="w-[22px] h-[22px] lg:w-[25px] lg:h-[25px] flex items-center justify-center rounded-[6px] sm:rounded-[8px] bg-[#DEE8F2] font-avenir font-semibold text-[16px] sm:text-[18px] md:text-[20px] leading-[100%] text-[#000000] opacity-[0.72]">
                             1
                         </div>
                         <DiagonalSlashIcon color="#21527D" />
-                        <div className="font-avenir font-bold text-[16px] sm:text-[18px] md:text-[20px] leading-[100%] text-[#000000]">
+                        <div className="font-avenir font-bold text-[16px] sm:text-[18px] lg:text-[20px] leading-[100%] text-[#000000]">
                             20
                         </div>
-                        <div className='w-[50px] h-[50px] bg-[#21527D] flex justify-center items-center rounded-[100%]'>
-                            <RightArrowIcon width={20} height={20} color='#FDFDFD'/>
+                        <div className='w-[30px] lg:w-[50px] h-[30px] lg:h-[50px] bg-[#21527D] flex justify-center items-center rounded-[100%]'>
+                            <RightArrowIcon width={20} height={20} color='#FDFDFD' />
                         </div>
                     </div>
                 </div>
 
                 {/* Export Button */}
-                <button className="order-3 font-avenir font-black text-[14px] sm:text-[16px] leading-[100%] text-[#FDFDFD] bg-[#21527D] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-auto min-w-[120px] sm:min-w-[200px] md:min-w-[220px] lg:min-w-[240px] h-[45px] sm:h-[50px] md:h-[55px] rounded-[12px] sm:rounded-[15px] flex items-center justify-center hover:opacity-90 transition-opacity">
+                <button
+                    onClick={() => setShowExportPopup(true)}
+                    className="order-3 font-avenir font-bold lg:font-black text-[14px] sm:text-[16px] leading-[100%] text-[#FDFDFD] bg-[#21527D] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-auto min-w-[120px] sm:min-w-[200px] lg:min-w-[220px] lg:min-w-[240px] h-[45px] sm:h-[50px] md:h-[55px] rounded-[12px] sm:rounded-[15px] flex items-center justify-center hover:opacity-90 transition-opacity">
                     Export
                 </button>
+
+                {showExportPopup && (
+                    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+                        <ExportSuccessfulPopup closePopup={() => setShowExportPopup(false)} />
+                    </div>
+                )}
             </div>
         </div>
     );

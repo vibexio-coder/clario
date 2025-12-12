@@ -1,10 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import img1 from '../../assets/images/clarioimg.webp';
 import bgimg from '../../assets/images/backgroundimg.webp';
+import LandingPopup from '../ocrpopups/LandingPopup';
 
 const LandingSection = () => {
+    const [showPopup, setShowPopup] = useState(false);
+
+    useEffect(() => {
+        if (showPopup) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "auto";
+        }
+    }, [showPopup]);
+
     return (
-        <div 
+        <div
             className="w-full flex justify-center items-center 
                        bg-cover bg-center bg-no-repeat py-5"
             style={{ backgroundImage: `url(${bgimg})` }}
@@ -52,7 +63,7 @@ const LandingSection = () => {
                         text-[#121212] max-w-[750px] text-center
                     ">
                         Convert documents, images, and handwritten text into structured, editable content
-                        with exceptional accuracy and speed. Preserve layouts, detect tables, and export 
+                        with exceptional accuracy and speed. Preserve layouts, detect tables, and export
                         seamlessly all from a single, streamlined platform.
                     </p>
 
@@ -67,9 +78,21 @@ const LandingSection = () => {
                             px-8 sm:px-10 py-3 
                             hover:opacity-90 transition
                         "
+                        onClick={() => setShowPopup(true)}
                     >
                         Extract
                     </button>
+
+                    {showPopup && (
+                        <div className="
+        fixed inset-0 flex items-center justify-center 
+        bg-black/40 backdrop-blur-sm 
+        z-50
+    ">
+                            <LandingPopup closePopup={() => setShowPopup(false)} />
+                        </div>
+                    )}
+
 
                 </div>
             </div>

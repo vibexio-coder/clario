@@ -3,7 +3,7 @@ import bgimg from '../../assets/images/enterpricebgimg.webp'
 
 const EnterpriseScreen = () => {
     return (
-        <div className="w-full flex justify-center relative overflow-hidden py-10">
+        <div className="w-full flex justify-center relative overflow-hidden py-10 px-5 md:px-8 lg:px-10">
             <div className="w-full max-w-[950px]">
 
                 {/* Title Section */}
@@ -46,65 +46,6 @@ const EnterpriseScreen = () => {
                         bg-[#373737] border border-[#DCDCDC80] shadow-[0px_0px_4px_4px_#FFFFFF40] rounded-[100px]">
                         Contact Sales
                     </button>
-                </div>
-
-                {/* Demo Circle */}
-                <div className='absolute bottom-0 right-0 z-0 hidden md:block'>
-                    <div className="relative w-[180px] md:w-[220px] h-[180px] md:h-[220px] flex items-center justify-center">
-                        <svg width="190" height="190" className="absolute inset-0 rotate-15 md:w-[230px] md:h-[230px]">
-                            {/* TOP ARC */}
-                            <path
-                                id="topArc"
-                                d="M 35 110 A 75 75 0 0 1 185 110"
-                                fill="none"
-                            />
-                            {/* BOTTOM ARC */}
-                            <path
-                                id="bottomArc"
-                                d="M 185 110 A 75 75 0 0 1 35 110"
-                                fill="none"
-                            />
-                            {/* TOP TEXT */}
-                            <text
-                                fill="#BB9013"
-                                fontSize="16"
-                                md:fontSize="18"
-                                fontFamily="Inter"
-                                letterSpacing="8px"
-                                md:letterSpacing="10px"
-                            >
-                                <textPath
-                                    href="#topArc"
-                                    startOffset="50%"
-                                    textAnchor="middle"
-                                >
-                                    Free Demo ★
-                                </textPath>
-                            </text>
-                            {/* BOTTOM TEXT */}
-                            <text
-                                fill="#BB9013"
-                                fontSize="16"
-                                md:fontSize="18"
-                                fontFamily="Inter"
-                                letterSpacing="8px"
-                                md:letterSpacing="10px"
-                            >
-                                <textPath
-                                    href="#bottomArc"
-                                    startOffset="50%"
-                                    textAnchor="middle"
-                                >
-                                    Free Demo ★
-                                </textPath>
-                            </text>
-                        </svg>
-
-                        {/* CENTER CIRCLE */}
-                        <div className="font-avenir font-[700] text-[22px] md:text-[24px] text-[#121212] bg-[#FFE8A7] shadow-[0px_0px_17px_1px_#F5B90C] w-[100px] md:w-[120px] h-[100px] md:h-[120px] rounded-full flex items-center justify-center">
-                            Book
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

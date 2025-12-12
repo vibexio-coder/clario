@@ -1,9 +1,10 @@
 import React from 'react';
 import bgimg from '../../assets/images/personalbgimg.webp';
+import { Link } from 'react-router-dom';
 
 const PersonalScreen = () => {
     return (
-        <div className="w-full min-h-screen py-10 bg-[#FDFDFD]  bg-cover bg-center"
+        <div className="w-full min-h-screen py-10 bg-[#FDFDFD]  bg-cover bg-center  px-5 md:px-8 lg:px-10"
             style={{ backgroundImage: `url(${bgimg})` }}>
             {/* Heading */}
             <div className='w-full flex justify-center'>
@@ -55,9 +56,9 @@ const PersonalScreen = () => {
                             </div>
                         </div>
 
-                        <button className="font-avenir font-[600] text-[18px] bg-[#FFF5D9] border border-[#FFE9A8] shadow-[0px_0px_4px_2px_#FFE085] rounded-[100px] px-8 py-2 z-10">
+                        <Link to='/uploadpage' className="font-avenir font-[600] text-[18px] bg-[#FFF5D9] border border-[#FFE9A8] shadow-[0px_0px_4px_2px_#FFE085] rounded-[100px] px-8 py-2 z-10">
                             Subscribe
-                        </button>
+                        </Link>
                     </div>
                 </div>
 
@@ -138,61 +139,6 @@ const PersonalScreen = () => {
                         <button className="font-avenir font-[600] text-[18px] bg-[#FCF3FF] border border-[#9E8BAD] backdrop-blur-[300px] shadow-[0px_0px_5.2px_2px_#D3B1E1] rounded-[100px] px-8 py-2 z-10">
                             Subscribe
                         </button>
-                    </div>
-                </div>
-
-                {/* Demo Circle */}
-                <div className='absolute bottom-0 right-0 z-0'>
-                    <div className="relative w-[220px] h-[220px] flex items-center justify-center">
-                        <svg width="230" height="230" className="absolute inset-0 rotate-15">
-                            {/* TOP ARC */}
-                            <path
-                                id="topArc"
-                                d="M 35 110 A 75 75 0 0 1 185 110"
-                                fill="none"
-                            />
-                            {/* BOTTOM ARC */}
-                            <path
-                                id="bottomArc"
-                                d="M 185 110 A 75 75 0 0 1 35 110"
-                                fill="none"
-                            />
-                            {/* TOP TEXT */}
-                            <text
-                                fill="#BB9013"
-                                fontSize="18"
-                                fontFamily="Inter"
-                                letterSpacing="10px"
-                            >
-                                <textPath
-                                    href="#topArc"
-                                    startOffset="50%"
-                                    textAnchor="middle"
-                                >
-                                    Free Demo ★
-                                </textPath>
-                            </text>
-                            {/* BOTTOM TEXT */}
-                            <text
-                                fill="#BB9013"
-                                fontSize="18"
-                                fontFamily="Inter"
-                                letterSpacing="10px"
-                            >
-                                <textPath
-                                    href="#bottomArc"
-                                    startOffset="50%"
-                                    textAnchor="middle"
-                                >
-                                    Free Demo ★
-                                </textPath>
-                            </text>
-                        </svg>
-
-                        {/* CENTER CIRCLE */}
-                        <div className="font-avenir font-[700] text-[24px] text-[#121212] bg-[#FFE8A7] shadow-[0px_0px_17px_1px_#F5B90C] w-[120px] h-[120px] rounded-full flex items-center justify-center">
-                            Book
-                        </div>
                     </div>
                 </div>
             </div>
