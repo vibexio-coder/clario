@@ -1,27 +1,59 @@
 import React, { useEffect, useState } from 'react';
 import img1 from '../../assets/images/clarioimg.webp';
 import LandingPopup from '../ocrpopups/LandingPopup';
+import InvoiceDoc from '../ocrpopups/InvoiceDoc';
 
 const LandingSection = () => {
     const [showPopup, setShowPopup] = useState(false);
 
     useEffect(() => {
         if (showPopup) {
+            const scrollY = window.scrollY;
+
+            // Save the scroll position and fix the body
+            document.body.style.position = "fixed";
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.left = "0";
+            document.body.style.right = "0";
+            document.body.style.width = "100%";
             document.body.style.overflow = "hidden";
         } else {
-            document.body.style.overflow = "auto";
+            const scrollY = document.body.style.top;
+
+            // Restore the body styles
+            document.body.style.position = "";
+            document.body.style.top = "";
+            document.body.style.left = "";
+            document.body.style.right = "";
+            document.body.style.width = "";
+            document.body.style.overflow = "";
+
+            // Restore the scroll position
+            if (scrollY) {
+                window.scrollTo(0, parseInt(scrollY || "0") * -1);
+            }
         }
+
+        // Cleanup function
+        return () => {
+            document.body.style.position = "";
+            document.body.style.top = "";
+            document.body.style.left = "";
+            document.body.style.right = "";
+            document.body.style.width = "";
+            document.body.style.overflow = "";
+        };
     }, [showPopup]);
 
     return (
         <div
             className="w-full flex justify-center items-center 
-                       bg-cover bg-center bg-no-repeat py-5">
+                       bg-cover bg-center bg-no-repeat py-10">
             <div className="
                 w-full max-w-[900px] 
                 bg-[#FDFDFD] 
                 shadow-[0px_0px_22.8px_2px_#57575740]
-                rounded-[20px] 
+                md:rounded-[20px] 
                 flex flex-col items-center 
                 px-4 sm:px-6 md:px-10 
                 py-8 sm:py-10 md:py-12
@@ -54,7 +86,7 @@ const LandingSection = () => {
 
                     {/* DESCRIPTION */}
                     <p className="
-                        font-avenir font-light 
+                        font-avenir font-regular
                         text-[14px] sm:text-[15px] md:text-[16px] 
                         leading-[26px] sm:leading-[28px] md:leading-[29px] 
                         text-[#121212] max-w-[750px] text-center
@@ -66,13 +98,12 @@ const LandingSection = () => {
 
                     {/* BUTTON */}
                     <button
-                        className="
+                        className="w-[240px] h-[50px]
                             mt-3 sm:mt-4 
                             font-avenir font-[700] 
                             text-[16px] sm:text-[18px] md:text-[20px] 
                             leading-[100%] text-[#EDECE9] 
                             bg-[#21527D] rounded-[30px] 
-                            px-8 sm:px-10 py-3 
                             hover:opacity-90 transition
                         "
                         onClick={() => setShowPopup(true)}
@@ -86,7 +117,7 @@ const LandingSection = () => {
         bg-black/40 backdrop-blur-sm 
         z-50
     ">
-                            <LandingPopup closePopup={() => setShowPopup(false)} />
+                            <InvoiceDoc onClose={() => setShowPopup(false)} />
                         </div>
                     )}
 

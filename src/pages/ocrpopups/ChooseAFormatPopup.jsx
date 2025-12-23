@@ -22,8 +22,8 @@ const ChooseAFormatPopup = ({ closePopup, openExtracting }) => {
 
             {/* 3 Formats */}
             <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-2">
-                <div className="w-[90px] h-[90px] sm:w-[100px] sm:h-[100px] bg-[#F2EDF4] shadow-[0px_0px_4px_0px_#80628E7A_inset] rounded-[10px] flex justify-center items-center">
-                    <PdfIcon width={40} height={40} color="#80628E" opacity={1} />
+                <div className="w-[90px] h-[90px] sm:w-[100px] sm:h-[100px] bg-[#EDF2F8] shadow-[0px_0px_4px_0px_#21527D40_inset] rounded-[10px] flex justify-center items-center">
+                    <PdfIcon width={40} height={40} color="#21527D" opacity={1} />
                 </div>
                 <div className="w-[90px] h-[90px] sm:w-[100px] sm:h-[100px] bg-[#EDF2F8] shadow-[0px_0px_4px_0px_#21527D40_inset] rounded-[10px] flex justify-center items-center">
                     <DocIcon width={40} height={40} color="#21527D" opacity={1} />

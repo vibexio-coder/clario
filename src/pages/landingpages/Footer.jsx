@@ -3,7 +3,7 @@ import icon from "../../assets/images/icon.webp";
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-[#EEF3F7] px-4 sm:px-6 lg:px-12 py-10 pb-20 lg:pb-5">
+    <footer className="w-full bg-[#E7EDF2] px-4 sm:px-6 lg:px-12 py-10 pb-5">
       {/* Top Section */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_2fr] gap-8 lg:gap-12">
         {/* Left Branding */}
@@ -47,7 +47,7 @@ const Footer = () => {
         </div>
 
         {/* Right Links */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-8 md:gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-10 md:gap-6 lg:gap-8">
           {/* Column 1 - Product */}
           <div className="text-center lg:text-left">
             <h3 className="font-avenir font-bold text-[18px] text-[#21527D] mb-3">
@@ -150,7 +150,7 @@ const Footer = () => {
         flex flex-col lg:flex-row gap-3 lg:gap-0 justify-between items-center text-center lg:text-left">
 
         <div className="font-avenir font-semibold text-[14px] text-[#464646]">
-          © 2025 Clario · A Product of{" "}
+          © 2025 <span className="font-bold text-[#21527D]"> Clario.</span> A Product of{" "}
           <span className="font-bold text-[#21527D]">Vibexio.ai</span>
         </div>
 

@@ -7,7 +7,7 @@ import Footer from '../landingpages/Footer';
 const LandingPage = () => {
     return (
         <div>
-            <div className='w-full px-4 sm:px-6 lg:px-12 py-5'>
+            <div>
                 <Navbar />
             </div>
             <div className='w-full px-4 sm:px-6 lg:px-0'>

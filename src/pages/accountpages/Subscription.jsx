@@ -6,7 +6,7 @@ import TrashIcon from '../../assets/icons/accountpage/TrashIcon';
 const Subscription = () => {
     return (
         <div>
-            <h1 className='font-avenir font-[750] text-[24px] leading-[26px] tracking-[0] text-[#21527D] mb-5'>
+            <h1 className='font-avenir font-semibold lg:font-bold text-[20px] lg:text-[24px] leading-[26px] tracking-[0] text-[#21527D] mb-5'>
                 SUBSCRIPTION
             </h1>
 
@@ -72,7 +72,7 @@ const Subscription = () => {
                             bg-[#21527D] 
                             rounded-[10px]
                         '>
-                            Change Plan
+                            Upgrade
                         </button>
 
                         <button className='
@@ -97,19 +97,30 @@ const Subscription = () => {
             <div className='flex flex-row flex-wrap gap-5 mt-10 justify-center'>
 
                 {/* LOGOUT */}
-                <button className='w-full sm:w-[235px] h-[55px] md:h-[65px] flex items-center justify-center gap-3 
-                font-avenir font-[350] text-[20px] md:text-[24px] leading-[100%] tracking-[0.09em] 
-                capitalize text-[#21527D] bg-[#E9F5FF] shadow-[0px_1px_4px_0px_#0000001A] rounded-[100px]'>
-                    <RotateArrowIcon />
+                <button
+                    className="
+    w-full sm:w-[235px] h-[55px] md:h-[65px]
+    flex items-center justify-center gap-3
+    font-avenir font-[350] text-[20px] md:text-[24px]
+    leading-[100%] tracking-[0.09em] capitalize
+    text-[#21527D] bg-[#E9F5FF]
+    border border-[0.25px] border-[#21527D]
+    shadow-[0px_1px_4px_0px_#0000001A]
+    rounded-[100px]
+  "
+                >
+                    <RotateArrowIcon width={32} height={32} />
                     Logout
                 </button>
+
+
 
                 {/* DELETE ACCOUNT */}
                 <button className='w-full sm:w-[235px] h-[55px] md:h-[65px] flex items-center justify-center gap-3 
                 font-avenir font-[350] text-[20px] md:text-[24px] leading-[100%] tracking-[0.09em] capitalize 
                 text-[#C62525] bg-[#FFF4F4] border border-[0.25px] border-[#D25B5C] 
                 shadow-[0px_1px_4px_0px_#0000001A] rounded-[100px]'>
-                    <TrashIcon />
+                    <TrashIcon width={32} height={32} />
                     Delete
                 </button>
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // Base plans data
 const basePlans = [
@@ -24,7 +24,7 @@ const basePlans = [
     originalPriceColor: "text-[#5B7C99]",
     originalTextColor: "text-[#21527D]",
     originalSubtitleColor: "text-[#121212]",
-    link: "/uploadpage",
+    link: "/signup",
     isLink: true,
     features: [
       "10 pages/day OCR processing",
@@ -59,6 +59,7 @@ const basePlans = [
       "API access",
       "Email support",
     ],
+    link: "/signup",
   },
   {
     id: 3,
@@ -84,6 +85,7 @@ const basePlans = [
       "Priority support",
       "Advanced export options",
     ],
+    link: "/signup",
   },
 ];
 
@@ -97,7 +99,7 @@ const HIGHLIGHTED_COLOR = {
 
 const PlanCard = ({ plan, isHighlighted, onClick }) => {
   const ButtonComponent = plan.isLink ? Link : 'button';
-  const buttonProps = plan.isLink 
+  const buttonProps = plan.isLink
     ? { to: plan.link }
     : { type: "button" };
 
@@ -106,16 +108,16 @@ const PlanCard = ({ plan, isHighlighted, onClick }) => {
   const textColor = isHighlighted ? HIGHLIGHTED_COLOR.textColor : plan.originalTextColor;
   const subtitleColor = isHighlighted ? HIGHLIGHTED_COLOR.subtitleColor : plan.originalSubtitleColor;
   const priceColor = isHighlighted ? HIGHLIGHTED_COLOR.priceColor : plan.originalPriceColor;
-  
+
   // Button colors based on highlighted state
   const buttonBg = isHighlighted ? plan.highlightedButtonBg : plan.defaultButtonBg;
   const buttonTextColor = isHighlighted ? plan.highlightedButtonTextColor : plan.defaultButtonTextColor;
-  
+
   // Features section background based on highlighted state
   const featureBg = isHighlighted ? plan.highlightedFeatureBg : plan.defaultFeatureBg;
-
+  const navigate = useNavigate();
   return (
-    <div 
+    <div
       className={`flex-1 min-w-[280px] ${cardBg} rounded-[20px] shadow-[0px_0px_4px_0px_#00000040] p-4 md:p-5 lg:p-6 flex flex-col h-full cursor-pointer transition-colors duration-300`}
       onClick={onClick}
     >
@@ -141,21 +143,20 @@ const PlanCard = ({ plan, isHighlighted, onClick }) => {
 
       {/* BUTTON */}
       <div className="mt-auto mb-4">
-        <ButtonComponent
-          {...buttonProps}
-          className={`w-full max-w-[200px] mx-auto h-[50px] flex items-center justify-center font-avenir font-semibold text-[20px] rounded-full ${buttonTextColor} ${buttonBg} hover:opacity-90 transition-colors duration-300`}
+        <button
+          className={`w-full max-w-[200px] mx-auto h-[50px] flex items-center justify-center 
+  font-avenir font-semibold text-[20px] rounded-full ${buttonTextColor} ${buttonBg}`}
           onClick={(e) => {
-            // Prevent card click when clicking the button
             e.stopPropagation();
+            navigate(plan.link);
           }}
         >
           {plan.buttonText}
-        </ButtonComponent>
-        
+        </button>
+
         {plan.extra && (
-          <p className={`font-avenir font-bold italic text-[12px] text-center mt-2 ${
-            isHighlighted ? "text-white/80" : "text-[#B6B6B6]"
-          }`}>
+          <p className={`font-avenir font-bold italic text-[12px] text-center mt-2 ${isHighlighted ? "text-white/80" : "text-[#B6B6B6]"
+            }`}>
             {plan.extra}
           </p>
         )}
@@ -187,7 +188,7 @@ const PersonalScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] px-4 sm:px-6 md:px-8 lg:px-10 py-8 md:py-10">
+    <div className="bg-[#FDFDFD] px-4 sm:px-6 md:px-8 lg:px-10 py-8 md:py-10">
       {/* HEADING */}
       <div className="mb-8 md:mb-12">
         <h1 className="font-avenir font-semibold lg:font-bold text-2xl md:text-3xl lg:text-4xl text-[#121212] mb-2">
@@ -200,7 +201,7 @@ const PersonalScreen = () => {
 
       {/* CARDS CONTAINER */}
       <div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 items-stretch px-0 xl:px-15">
           {basePlans.map((plan) => (
             <PlanCard
               key={plan.id}
@@ -211,11 +212,6 @@ const PersonalScreen = () => {
           ))}
         </div>
       </div>
-      
-      {/* Optional: Instructions for user */}
-      <p className="text-center text-sm text-gray-500 mt-6">
-        Click on any card to highlight it with the special color
-      </p>
     </div>
   );
 };

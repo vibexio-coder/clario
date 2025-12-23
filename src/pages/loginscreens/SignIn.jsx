@@ -224,8 +224,7 @@ const SignIn = () => {
                     {/* Checkbox */}
                     <div className="flex items-center gap-2 mt-1 justify-center">
                         <p className="font-avenir text-[11px] sm:text-[12px] text-[#21527D]/75">
-                            <span className="underline ml-1 cursor-pointer">Terms of Service</span> &
-                            <span className="underline ml-1 cursor-pointer">Privacy Policy</span>
+                            Forgot your password?
                         </p>
                     </div>
                 </div>

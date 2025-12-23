@@ -23,7 +23,7 @@ const LandingPopup = ({ closePopup }) => {
             {/* Paragraph */}
             <p className="font-avenir font-[350] text-[16px] sm:text-[20px] leading-[26px] sm:leading-[33px] 
                           text-center text-[#686565] mb-8 px-2">
-                The 50-page Free Trial is over. Your access to automated workflows
+                The 10 page Free Trial is over. Your access to automated workflows
                 and extracted data is now paused.
             </p>
 

@@ -10,7 +10,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 
 const SignInBusiness = () => {
-     const navigate = useNavigate();
+    const navigate = useNavigate();
     const location = useLocation();
 
     const activeTab = location.pathname === "/signup" ? "personal" : "business";
@@ -20,7 +20,7 @@ const SignInBusiness = () => {
             <div className="w-full max-w-[480px] rounded-[40px] bg-[linear-gradient(205.4deg,#D0DFEB_36.54%,rgba(253,253,253,0.6)_180%)] shadow-[0px_16px_25.2px_7px_#1A55701A] p-4 sm:p-6 md:p-8 flex flex-col gap-3 relative">
                 {/* Title */}
                 <h2 className="font-avenir font-semibold lg:font-bold text-[22px] md:text-[30px] text-center text-[#121212] pt-2 sm:pt-0">
-                   Business Sign In
+                    Business Sign In
                 </h2>
 
                 {/* Toggle Buttons */}
@@ -92,8 +92,7 @@ const SignInBusiness = () => {
                     {/* Checkbox */}
                     <div className="flex items-center gap-2 mt-1 justify-center  pt-5">
                         <p className="font-avenir text-[11px] sm:text-[12px] text-[#21527D]/75">
-                            <span className="underline ml-1 cursor-pointer">Terms of Service</span> &
-                            <span className="underline ml-1 cursor-pointer">Privacy Policy</span>
+                            Forgot your password?
                         </p>
                     </div>
                 </div>
@@ -101,7 +100,7 @@ const SignInBusiness = () => {
                 {/* Sign Up Button */}
                 <div className="flex justify-center pt-1 sm:pt-0">
                     <button className="font-avenir font-[750] text-[14px] sm:text-[16px] text-[#FDFDFD] bg-[#21527D] rounded-[16px] w-[160px] sm:w-[180px] h-[46px] sm:h-[50px]">
-                       Sign In
+                        Sign In
                     </button>
                 </div>
 
@@ -124,7 +123,7 @@ const SignInBusiness = () => {
 
                 {/* Bottom Text */}
                 <p className="text-center font-avenir text-[13px] sm:text-[14px] text-[#121212]/40 pt-1 sm:pt-0">
-                   Create a new account?
+                    Create a new account?
                     <span className="font-[600] text-[14px] sm:text-[16px] text-[#21527D] ml-1 cursor-pointer">Business Sign up</span>
                 </p>
 

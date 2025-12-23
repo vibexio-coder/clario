@@ -28,8 +28,8 @@ const App = () => {
         <Route path="/businessinquiry" element={<BusinessInquiry />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signinbusiness" element={<SignInBusiness />} />
-        <Route path="/LandingPage" element={<LandingPage />} />
-        <Route path="/DemoLogin" element={<DemoLogin />} />
+        <Route path="/landingpage" element={<LandingPage />} />
+        <Route path="/demologin" element={<DemoLogin />} />
         <Route path="/" element={<DemoLandingScreen />} />
         <Route path="/accountpage" element={<AccountPage />} />
         <Route path="/enterprisescreen" element={<EnterpriseScreen />} />
@@ -38,11 +38,11 @@ const App = () => {
         <Route path="/uploadpage" element={<UploadPage />} />
         <Route path="/pricingpage" element={<PricingPage />} />
         <Route path="/landinpopup" element={<LandingPopup />} />
-        <Route path="/ExportSuccessfulPopup" element={<ExportSuccessfulPopup />} />
-        <Route path="/ExtractingFilesPopup" element={<ExtractingFilesPopup />} />
-        <Route path="/ChooseAFormatPopup" element={<ChooseAFormatPopup />} />
-        <Route path="/DemoSuccess" element={<DemoSuccess />} />
-        <Route path="/InvoiceDoc" element={<InvoiceDoc />} />
+        <Route path="/exportsuccessfulpopup" element={<ExportSuccessfulPopup />} />
+        <Route path="/extractingfilespopup" element={<ExtractingFilesPopup />} />
+        <Route path="/chooseaformatpopup" element={<ChooseAFormatPopup />} />
+        <Route path="/demosuccess" element={<DemoSuccess />} />
+        <Route path="/invoicedoc" element={<InvoiceDoc />} />
       </Routes>
     </div>
   );

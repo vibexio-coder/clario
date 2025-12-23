@@ -7,7 +7,7 @@ import TrashIcon from '../../assets/icons/accountpage/TrashIcon';
 const UserAccount = () => {
     return (
         <div>
-            <h1 className='font-avenir font-[750] text-[24px] leading-[26px] text-[#21527D] mb-5'>
+            <h1 className='font-avenir font-semibold lg:font-bold text-[20px] lg:text-[24px] leading-[26px] text-[#21527D] mb-5'>
                 ACCOUNT
             </h1>
 
@@ -32,7 +32,7 @@ const UserAccount = () => {
                     <input
                         type="text"
                         placeholder="E Mail"
-                        className="w-full h-full bg-transparent outline-none font-avenir font-[600] 
+                        className="w-full h-full bg-transparent outline-none font-avenir font-[600]  
                         text-[18px] md:text-[20px] leading-[24px] md:leading-[26px] placeholder:text-[#8D8D8D]"
                     />
                 </div>

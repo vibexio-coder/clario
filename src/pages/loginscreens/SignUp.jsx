@@ -21,7 +21,10 @@ const Signup = () => {
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
 
     const countryDropdownRef = useRef(null);
-    const activeTab = location.pathname === "/signup" ? "personal" : "business";
+    const activeTab = location.pathname.includes("/signup")
+        ? "personal"
+        : "business";
+
 
     const filteredCountries = countries.filter((c) =>
         c.name.toLowerCase().includes(searchCountry.toLowerCase()) ||
@@ -29,7 +32,7 @@ const Signup = () => {
     );
 
     const getFlagEmoji = (isoCode) => {
-        if (!isoCode) return "🇺🇸"; // Default flag
+        if (!isoCode) return "🇺🇸"; 
         return isoCode
             .toUpperCase()
             .replace(/./g, (char) =>
@@ -65,9 +68,9 @@ const Signup = () => {
     return (
         <div className="w-full min-h-screen flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat bg-[linear-gradient(76.43deg,#B5CBDD_11.39%,#D9E5EF_88.36%)]"
             style={{ backgroundImage: `url(${bgimg})` }}>
-            
+
             <div className="w-full max-w-[480px] rounded-[40px] bg-[linear-gradient(205.4deg,#D0DFEB_36.54%,rgba(253,253,253,0.6)_180%)] shadow-[0px_16px_25.2px_7px_#1A55701A] p-4 sm:p-6 md:p-8 flex flex-col gap-3 relative">
-                
+
                 {/* Title */}
                 <h2 className="font-avenir font-semibold lg:font-bold text-[22px] md:text-[32px] text-center text-[#121212] pt-2 sm:pt-0">
                     Create your Account
@@ -77,24 +80,22 @@ const Signup = () => {
                 <div className="flex justify-center gap-2 sm:gap-3">
                     <button
                         onClick={() => navigate("/signup")}
-                        className={`font-avenir text-[14px] sm:text-[16px] rounded-[100px] w-[110px] sm:w-[125px] h-[36px] sm:h-[40px] flex items-center justify-center ${
-                            activeTab === "personal"
+                        className={`font-avenir text-[14px] sm:text-[16px] rounded-[100px] w-[110px] sm:w-[125px] h-[36px] sm:h-[40px] flex items-center justify-center ${activeTab === "personal"
                                 ? "font-[700] text-[#FDFDFD] bg-[#21527D]"
                                 : "font-[600] text-[#21527D] bg-[#FDFDFD] shadow-[0px_8px_15px_-5px_#21527D26]"
-                        }`}
+                            }`}
                     >
                         Personal
                     </button>
 
                     <button
                         onClick={() => navigate("/businessinquiry")}
-                        className={`font-avenir text-[14px] sm:text-[16px] rounded-[100px] w-[110px] sm:w-[125px] h-[36px] sm:h-[40px] flex items-center justify-center ${
-                            activeTab === "business"
+                        className={`font-avenir text-[14px] sm:text-[16px] rounded-[100px] w-[110px] sm:w-[125px] h-[36px] sm:h-[40px] flex items-center justify-center ${activeTab === "business"
                                 ? "font-[700] text-[#FDFDFD] bg-[#21527D]"
                                 : "font-[600] text-[#21527D] bg-[#FDFDFD] shadow-[0px_8px_15px_-5px_#21527D26]"
-                        }`}
+                            }`}
                     >
-                        EnterPrise
+                        Enterprise
                     </button>
                 </div>
 
@@ -140,18 +141,18 @@ const Signup = () => {
                                 </div>
                                 <DownArrowIconForm className={`transition-transform duration-200 ${openCountry ? "rotate-180" : ""}`} />
                             </div>
-                            
+
                             <div className="w-[1px] bg-[#21527D26]" />
-                            
+
                             <input
                                 type="tel"
                                 placeholder="98xxxxxx76"
                                 className="flex-1 px-3 font-avenir text-[12px] text-[#82A9CC] placeholder:text-[#82A9CC] outline-none bg-transparent"
                             />
-                            
+
                             {/* Country Dropdown */}
                             {openCountry && (
-                                <div className="absolute top-full left-0 mt-1 w-[200px] bg-white rounded-xl shadow-lg overflow-hidden z-50">
+                                <div className="absolute top-full left-0 mt-1 w-[100px] bg-white rounded-xl shadow-lg overflow-hidden z-50 ">
                                     <input
                                         type="text"
                                         placeholder="Search country"
@@ -160,7 +161,7 @@ const Signup = () => {
                                         className="w-full px-3 py-2 font-avenir text-[12px] outline-none border-b border-[#E5EAF0] placeholder:text-[#869EB6]"
                                         autoFocus
                                     />
-                                    <div className="max-h-[240px] overflow-y-auto">
+                                    <div className="max-h-[240px] overflow-y-auto scrollbar-hide">
                                         {filteredCountries.length > 0 ? (
                                             filteredCountries.map((c) => (
                                                 <div
@@ -197,7 +198,7 @@ const Signup = () => {
                                 placeholder="Enter your Password"
                                 className="w-full h-[30px] rounded-[100px] bg-[#FDFDFD] shadow-[0px_2px_4px_1px_#21527D26] px-4 pr-10 font-avenir text-[12px] text-[#82A9CC] outline-none"
                             />
-                            <span 
+                            <span
                                 className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
                                 onClick={togglePasswordVisibility}
                             >
@@ -217,7 +218,7 @@ const Signup = () => {
                                 placeholder="Confirm your Password"
                                 className="w-full h-[30px] rounded-[100px] bg-[#FDFDFD] shadow-[0px_2px_4px_1px_#21527D26] px-4 pr-10 font-avenir text-[12px] text-[#82A9CC] outline-none"
                             />
-                            <span 
+                            <span
                                 className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
                                 onClick={toggleConfirmPasswordVisibility}
                             >
@@ -238,11 +239,11 @@ const Signup = () => {
                 </div>
 
                 {/* Sign Up Button */}
-                <div className="flex justify-center pt-1 sm:pt-0">
+                <Link to='/landingpage' className="flex justify-center pt-1 sm:pt-0">
                     <button className="font-avenir font-[750] text-[14px] sm:text-[16px] text-[#FDFDFD] bg-[#21527D] rounded-[16px] w-[160px] sm:w-[180px] h-[46px] sm:h-[50px] hover:bg-[#1a4166] transition-colors">
                         Sign Up
                     </button>
-                </div>
+                </Link>
 
                 {/* Divider */}
                 <div className="flex items-center gap-2 sm:gap-4 justify-center pt-1 sm:pt-0">

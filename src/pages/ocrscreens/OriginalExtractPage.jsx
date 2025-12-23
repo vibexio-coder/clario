@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MenuIcon from '../../assets/icons/uploadpage/MenuIcon';
 import HomeIcon from '../../assets/icons/uploadpage/HomeIcon';
 import CloseIcon from '../../assets/icons/loginpages/CloseIcon';
@@ -22,6 +22,49 @@ import Navbar from '../landingpages/Navbar';
 const OriginalExtractPage = () => {
     const [showExportPopup, setShowExportPopup] = useState(false);
     const [open, setOpen] = useState(false);
+
+    useEffect(() => {
+        console.log('Popup states:', {
+            exportPopup: showExportPopup,
+            open: open
+        });
+
+        if (showExportPopup || open) { // Add 'open' for the off-canvas sidebar
+            const scrollY = window.scrollY;
+            console.log('Saving scroll position:', scrollY);
+
+            document.body.style.position = "fixed";
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.left = "0";
+            document.body.style.right = "0";
+            document.body.style.width = "100%";
+            document.body.style.overflow = "hidden";
+        } else {
+            const scrollY = document.body.style.top;
+            console.log('Restoring from:', scrollY);
+
+            document.body.style.position = "";
+            document.body.style.top = "";
+            document.body.style.left = "";
+            document.body.style.right = "";
+            document.body.style.width = "";
+            document.body.style.overflow = "";
+
+            if (scrollY) {
+                window.scrollTo(0, parseInt(scrollY || "0") * -1);
+            }
+        }
+
+        return () => {
+            console.log('Cleanup running');
+            document.body.style.position = "";
+            document.body.style.top = "";
+            document.body.style.left = "";
+            document.body.style.right = "";
+            document.body.style.width = "";
+            document.body.style.overflow = "";
+        };
+    }, [showExportPopup, open]);
     return (
         <div>
             <Navbar />

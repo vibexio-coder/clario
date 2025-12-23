@@ -4,6 +4,7 @@ const LeftPaginationArrowIcon = ({
   width = 9,
   height = 15,
   color = "#21527D",
+  className = "",
 }) => {
   return (
     <svg
@@ -12,6 +13,7 @@ const LeftPaginationArrowIcon = ({
       viewBox="0 0 9 15"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
     >
       <path
         fillRule="evenodd"

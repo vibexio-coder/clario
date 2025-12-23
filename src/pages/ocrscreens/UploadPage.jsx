@@ -30,8 +30,48 @@ const UploadPage = () => {
     const [showExtractingPopup, setShowExtractingPopup] = useState(false);
 
     useEffect(() => {
-        document.body.style.overflow = showChooseFormatPopup ? "hidden" : "auto";
-    }, [showChooseFormatPopup]);
+        console.log('Popup states:', {
+            chooseFormat: showChooseFormatPopup,
+            extracting: showExtractingPopup
+        });
+
+        if (showChooseFormatPopup || showExtractingPopup) {
+            const scrollY = window.scrollY;
+            console.log('Saving scroll position:', scrollY);
+
+            document.body.style.position = "fixed";
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.left = "0";
+            document.body.style.right = "0";
+            document.body.style.width = "100%";
+            document.body.style.overflow = "hidden";
+        } else {
+            const scrollY = document.body.style.top;
+            console.log('Restoring from:', scrollY);
+
+            document.body.style.position = "";
+            document.body.style.top = "";
+            document.body.style.left = "";
+            document.body.style.right = "";
+            document.body.style.width = "";
+            document.body.style.overflow = "";
+
+            if (scrollY) {
+                window.scrollTo(0, parseInt(scrollY || "0") * -1);
+            }
+        }
+
+        return () => {
+            console.log('Cleanup running');
+            document.body.style.position = "";
+            document.body.style.top = "";
+            document.body.style.left = "";
+            document.body.style.right = "";
+            document.body.style.width = "";
+            document.body.style.overflow = "";
+        };
+    }, [showChooseFormatPopup, showExtractingPopup]);
+
 
     const fileList = [
         { id: 1, name: "File.pdf", Icon: PdfIcon },
@@ -42,13 +82,54 @@ const UploadPage = () => {
         { id: 6, name: "File.svg", Icon: SvgIcon },
     ];
 
+    const [showPopup, setShowPopup] = useState(false);
+
+    useEffect(() => {
+        console.log('showPopup changed:', showPopup);
+
+        if (showPopup) {
+            const scrollY = window.scrollY;
+            console.log('Saving scroll position:', scrollY);
+
+            document.body.style.position = "fixed";
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.left = "0";
+            document.body.style.right = "0";
+            document.body.style.width = "100%";
+            document.body.style.overflow = "hidden";
+        } else {
+            const scrollY = document.body.style.top;
+            console.log('Restoring from:', scrollY);
+
+            document.body.style.position = "";
+            document.body.style.top = "";
+            document.body.style.left = "";
+            document.body.style.right = "";
+            document.body.style.width = "";
+            document.body.style.overflow = "";
+
+            if (scrollY) {
+                window.scrollTo(0, parseInt(scrollY || "0") * -1);
+            }
+        }
+
+        return () => {
+            console.log('Cleanup running');
+            document.body.style.position = "";
+            document.body.style.top = "";
+            document.body.style.left = "";
+            document.body.style.right = "";
+            document.body.style.width = "";
+            document.body.style.overflow = "";
+        };
+    }, [showPopup]);
+
     return (
         <div>
             <Navbar />
             <div className="bg-white p-6 md:p-10 relative">
                 {/* Main Content Container */}
                 <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 xl:gap-20 px-0 md:px-10 xl:px-30">
-
                     {/* Left Column */}
                     <div className="lg:w-1/2 flex flex-col gap-6 md:gap-8">
                         {/* Upload Section */}
@@ -67,47 +148,42 @@ const UploadPage = () => {
                                 Upload
                             </button>
                         </div>
-                        <div
-                            className="bg-[#FDFDFD] rounded-[20px]
-  shadow-[0px_3px_6.9px_2px_#6C5E5E26]
-  p-5 flex flex-col gap-4
-  h-[430px] overflow-y-auto custom-scroll"
-                        >
-                            {fileList.map(({ id, name, Icon }) => (
-                                <div
-                                    key={id}
-                                    className="bg-[#C5D4E2]/70 flex items-center rounded-[20px]
-      px-4 py-3 md:px-5 md:py-4 w-full gap-4"
-                                >
-                                    <Icon color="#21527D" width={40} height={40} opacity={1} />
+                        <div className="bg-[#FDFDFD] rounded-[20px] shadow-[0px_3px_6.9px_2px_#6C5E5E26] p-5 h-[430px] overflow-hidden">
+                            <div className="h-full overflow-y-auto pr-2 custom-scroll">
+                                <div className="flex flex-col gap-4">
+                                    {fileList.map(({ id, name, Icon }) => (
+                                        <div
+                                            key={id}
+                                            className="bg-[#C5D4E2]/70 flex items-center rounded-[20px] px-4 py-3 md:px-5 md:py-4 w-full gap-4"
+                                        >
+                                            <Icon color="#21527D" width={40} height={40} opacity={1} />
 
-                                    <div className="flex-1">
-                                        <h2 className="font-avenir font-bold text-[12px] text-[#000000]">
-                                            {name}
-                                        </h2>
+                                            <div className="flex-1">
+                                                <h2 className="font-avenir font-bold text-[12px] text-[#000000]">
+                                                    {name}
+                                                </h2>
 
-                                        <div className="w-full max-w-[200px] h-[3px] bg-[#FFFFFF] rounded-[10px] mt-2">
-                                            <div className="h-full bg-[#21527D] rounded-[10px]" style={{ width: "60%" }} />
+                                                <div className="w-full max-w-[200px] h-[3px] bg-[#FFFFFF] rounded-[10px] mt-2">
+                                                    <div
+                                                        className="h-full bg-[#21527D] rounded-[10px]"
+                                                        style={{ width: "60%" }}
+                                                    />
+                                                </div>
+
+                                                <p className="font-avenir text-[10px] text-[#000000] mt-1">
+                                                    Not able to Upload
+                                                </p>
+                                            </div>
+
+                                            <div className="flex items-center gap-3 md:gap-4">
+                                                <TrashIcon color="#21527D" width={20} height={20} />
+                                                <EyeIcon color="#21527D" width={20} height={20} opacity={1}/>
+                                            </div>
                                         </div>
-
-                                        <p className="font-avenir text-[10px] text-[#000000] mt-1">
-                                            Not able to Upload
-                                        </p>
-                                    </div>
-
-                                    <div className="flex items-center gap-3 md:gap-4">
-                                        <TrashIcon color="#21527D" width={20} height={20} />
-                                        <EyeIcon color="#21527D" width={20} height={20} />
-                                    </div>
+                                    ))}
                                 </div>
-                            ))}
-
-                            <div className="font-avenir font-semibold text-[14px] text-end cursor-pointer hover:text-[#21527D]">
-                                View All
                             </div>
                         </div>
-
-
                     </div>
 
                     {/* Right Column */}
@@ -139,7 +215,7 @@ const UploadPage = () => {
                         </div>
 
                         {/* Control Bar */}
-                        <div className="gap-y-3 flex flex-wrap md:flex-nowrap items-center justify-center md:justify-between w-full px-4 py-3 bg-[#E7EDF2] rounded-[15px]">
+                        <div className="gap-y-3 flex flex-wrap md:flex-nowrap items-center justify-center  w-full px-4 py-3 bg-[#E7EDF2] rounded-[15px] gap-3">
                             {/* Left Zoom Controls */}
                             <div className="flex items-center gap-2 sm:gap-3 pr-4 border-r border-[#21527D]/20">
                                 <SearchMinusIcon />
@@ -151,7 +227,7 @@ const UploadPage = () => {
 
                             {/* Pagination Section */}
                             <div className="flex items-center gap-1 xm:gap-2 px-4 border-r border-[#21527D]/20">
-                                <LeftPaginationArrowIcon />
+                                <LeftPaginationArrowIcon color="#21527D"/>
                                 <div className="w-[22px] h-[22px] flex items-center justify-center rounded-[8px] bg-[#FFFFFF] text-[#21527D] font-avenir font-black text-[14px] leading-[100%] opacity-[0.70]">
                                     1
                                 </div>
@@ -163,7 +239,7 @@ const UploadPage = () => {
                             </div>
 
                             {/* Right Action Buttons */}
-                            <div className="flex items-center gap-3 pl-4">
+                            <div className="flex items-center gap-10 pl-4">
                                 <TextIcon />
                                 <RefreshRotateIcon />
                                 <TrashIcon width={24} height={24} color="#000000" />
