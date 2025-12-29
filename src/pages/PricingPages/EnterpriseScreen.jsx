@@ -1,6 +1,12 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+
 
 const EnterpriseScreen = () => {
+
+
+  const navigate = useNavigate();
+
   return (
     <div className="w-full flex justify-center py-10 px-4 md:px-8 lg:px-10">
       <div className="w-full ">
@@ -53,6 +59,7 @@ const EnterpriseScreen = () => {
             {/* CTA */}
             <div className="flex flex-col items-center mt-6">
               <button
+                onClick={() => navigate('/fullname')}
                 className="
                   font-avenir font-bold
                   text-[16px] sm:text-[18px]
@@ -60,9 +67,8 @@ const EnterpriseScreen = () => {
                   bg-[#21527D]
                   rounded-[100px]
                   w-full max-w-[200px] mx-auto h-[50px]
-                  hover:opacity-90 transition
-                "
-              >
+                  hover:opacity-90 transition cursor-pointer
+                ">
                 Contact Sales
               </button>
 

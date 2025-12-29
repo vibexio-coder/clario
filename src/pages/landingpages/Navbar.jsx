@@ -39,8 +39,10 @@ const NAV_ITEMS = {
 
 const USER_MENU = [
     { label: "Account", to: "/account" },
-    { label: "Subscription", to: "/pricingpage" },
-    { label: "Invoice", to: "/invoice" },
+    { label: " Profile", to: "/profile" },
+    { label: " Security", to: "/security" },
+    { label: "Subscription", to: "/subscription" },
+    { label: "Billing & Invoices", to: "/invoice" },
     { label: "Help & Support", to: "/accountpage" },
     {
         label: "Logout",
@@ -142,7 +144,6 @@ const Navbar = () => {
                                 <div
                                     key={title}
                                     className="relative"
-                                    ref={dropdownRef}
                                     onMouseEnter={() => handleDropdownEnter(title)}
                                     onMouseLeave={handleDropdownLeave}
                                 >
@@ -202,7 +203,6 @@ const Navbar = () => {
                     {/* User Menu - Desktop */}
                     <div
                         className="hidden lg:block relative"
-                        ref={userDropdownRef}
                         onMouseEnter={handleUserEnter}
                         onMouseLeave={handleUserLeave}
                     >
@@ -217,35 +217,58 @@ const Navbar = () => {
 
                         {userOpen && (
                             <div className="absolute left-1/2 transform -translate-x-1/2 top-full pt-1 z-50">
-                                <div className="bg-[#E7EDF2] border border-[#BCD6EB] rounded-[10px] 
-                            shadow-[0px_0px_5px_0px_#00000040] min-w-[220px] py-1">
-                                    {USER_MENU.map((item, index) => (
-                                        <div key={index}
-                                        className="border-b border-[#BCD6EB] last:border-b-0">
-                                            {item.action === "logout" ? (
-                                                <button
-                                                    onClick={() => {
-                                                        // Handle logout logic here
-                                                        console.log("Logout clicked");
-                                                        setUserOpen(false);
-                                                    }}
-                                                    className="flex items-center w-full px-6 py-3.5 font-avenir font-semibold text-[16px] leading-[24px] text-[#464646] border-b border-[#BCD6EB] last:border-b-0 hover:bg-[#DEE6ED] transition-colors gap-3">
-                                                    {item.Icon && <item.Icon width={30} height={30} />}
-                                                    <span className="font-avenir font-medium text-[20px] leading-[1.2] tracking-[0.04em] capitalize text-[#21527D]">
+                                <div className="bg-[#E7EDF2] border border-[#BCD6EB] rounded-[10px]
+      shadow-[0px_0px_5px_0px_#00000040] min-w-[220px] py-1">
+
+                                    {USER_MENU.map((item, index) => {
+                                        const isAccount = item.label.trim() === "Account";
+
+                                        return (
+                                            <div
+                                                key={index}
+                                                className="border-b border-[#BCD6EB] last:border-b-0"
+                                            >
+                                                {/* 🔹 ACCOUNT (NO ROUTE) */}
+                                                {isAccount ? (
+                                                    <div
+                                                        className="px-6 py-3.5 text-center
+                font-avenir font-[750] text-[16px]
+                leading-[100%] tracking-[0.03em]
+                text-[#21527D]"
+                                                    >
                                                         {item.label}
-                                                    </span>
-                                                </button>
-                                            ) : (
-                                                <Link
-                                                    to={item.to}
-                                                    className="block px-6 py-3.5 font-avenir font-semibold text-[16px] leading-[24px] text-[#464646] border-b border-[#BCD6EB] last:border-b-0 hover:bg-[#DEE6ED] transition-colors"
-                                                    onClick={() => setUserOpen(false)}
-                                                >
-                                                    {item.label}
-                                                </Link>
-                                            )}
-                                        </div>
-                                    ))}
+                                                    </div>
+                                                ) : item.action === "logout" ? (
+                                                    /* 🔹 LOGOUT (STYLE UNCHANGED) */
+                                                    <button
+                                                        onClick={() => {
+                                                            setUserOpen(false);
+                                                            navigate("/logout"); // ✅ correct route
+                                                        }}
+                                                        className="flex items-center w-full px-6 py-3.5
+                font-avenir font-semibold text-[16px]
+                leading-[24px] text-[#464646]
+                hover:bg-[#DEE6ED] transition-colors gap-3"
+                                                    >
+                                                        {item.Icon && <item.Icon width={30} height={30} />}
+                                                        <span>{item.label}</span>
+                                                    </button>
+                                                ) : (
+                                                    /* 🔹 NORMAL LINKS */
+                                                    <Link
+                                                        to={item.to}
+                                                        onClick={() => setUserOpen(false)}
+                                                        className="block px-6 py-3.5
+                font-avenir font-semibold text-[16px]
+                leading-[24px] text-[#464646]
+                hover:bg-[#DEE6ED] transition-colors"
+                                                    >
+                                                        {item.label}
+                                                    </Link>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         )}

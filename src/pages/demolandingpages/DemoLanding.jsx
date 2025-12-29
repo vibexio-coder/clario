@@ -48,30 +48,6 @@ const DemoLanding = () => {
 
     return (
         <div>
-            <Link to='demologin'>
-                <button
-                    className="
-    hidden lg:block fixed top-1/4 right-0 z-40
-    font-avenir font-semibold text-[20px] tracking-[0.05em]
-    text-white bg-[#21527D] py-3 px-6 rounded-[10px]
-    -rotate-90 origin-bottom-right
-  "
-                >
-                    Book a demo
-                </button>
-                <button
-                    className="
-    fixed bottom-0 left-0 w-full py-4 z-40
-    font-avenir font-semibold text-[16px] tracking-[0.05em]
-    text-white bg-[#21527D] rounded-none
-    lg:hidden
-  "
-                >
-                    Book a demo
-                </button>
-
-            </Link>
-
             <div
                 className="w-full flex justify-center items-center 
                        bg-cover bg-center bg-no-repeat py-10">

@@ -19,15 +19,22 @@ import DemoSuccess from './pages/ocrpopups/DemoSuccess';
 import InvoiceDoc from './pages/ocrpopups/InvoiceDoc';
 import DemoLandingScreen from './pages/ocrscreens/DemoLandingScreen';
 import DemoLogin from './pages/loginscreens/DemoLogin';
+import Password from './pages/signinsplitscreens/Password';
+import Otp from './pages/signinsplitscreens/otp';
+import FullName from './pages/signinsplitscreens/FullName';
+import CreatePassword from './pages/signinsplitscreens/CreatePassword';
+import BusinessDetected from './pages/signinsplitscreens/BusinessDetected';
+import BusinessUser from './pages/signinsplitscreens/BusinessUser';
+import AllUsers from './pages/signinsplitscreens/AllUsers';
+import Logout from './pages/ocrpopups/Logout';
+import DeleteAccount from './pages/ocrpopups/DeleteAccount';
+import Account from './pages/accountpages/Account';
 
 const App = () => {
   return (
     <div>
       <Routes>
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/businessinquiry" element={<BusinessInquiry />} />
         <Route path="/signin" element={<SignIn />} />
-        <Route path="/signinbusiness" element={<SignInBusiness />} />
         <Route path="/landingpage" element={<LandingPage />} />
         <Route path="/demologin" element={<DemoLogin />} />
         <Route path="/" element={<DemoLandingScreen />} />
@@ -43,6 +50,16 @@ const App = () => {
         <Route path="/chooseaformatpopup" element={<ChooseAFormatPopup />} />
         <Route path="/demosuccess" element={<DemoSuccess />} />
         <Route path="/invoicedoc" element={<InvoiceDoc />} />
+        <Route path="/password" element={<Password />} />
+        <Route path="/otp" element={<Otp />} />
+        <Route path="/fullname" element={<FullName />} />
+        <Route path="/createpassword" element={<CreatePassword />} />
+        <Route path="/businessdetected" element={<BusinessDetected />} />
+        <Route path="/businessuser" element={<BusinessUser />} />
+        <Route path="/allusers" element={<AllUsers />} />
+        <Route path="/logout" element={<Logout />} />
+        <Route path="/deleteaccount" element={<DeleteAccount />} />
+        <Route path="/account" element={<Account />} />
       </Routes>
     </div>
   );

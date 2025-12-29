@@ -24,7 +24,7 @@ const basePlans = [
     originalPriceColor: "text-[#5B7C99]",
     originalTextColor: "text-[#21527D]",
     originalSubtitleColor: "text-[#121212]",
-    link: "/signup",
+    link: "/fullname",
     isLink: true,
     features: [
       "10 pages/day OCR processing",
@@ -59,7 +59,7 @@ const basePlans = [
       "API access",
       "Email support",
     ],
-    link: "/signup",
+    link: "/fullname",
   },
   {
     id: 3,
@@ -85,7 +85,7 @@ const basePlans = [
       "Priority support",
       "Advanced export options",
     ],
-    link: "/signup",
+    link: "/fullname",
   },
 ];
 
@@ -144,7 +144,7 @@ const PlanCard = ({ plan, isHighlighted, onClick }) => {
       {/* BUTTON */}
       <div className="mt-auto mb-4">
         <button
-          className={`w-full max-w-[200px] mx-auto h-[50px] flex items-center justify-center 
+          className={`w-full max-w-[200px] mx-auto h-[50px] flex items-center justify-center hover:opacity-70 transition cursor-pointer
   font-avenir font-semibold text-[20px] rounded-full ${buttonTextColor} ${buttonBg}`}
           onClick={(e) => {
             e.stopPropagation();

@@ -204,15 +204,9 @@ const DemoNavbar = () => {
           <div className="hidden lg:flex items-center gap-2 xl:gap-4">
             <Link
               to="/signin"
-              className="font-avenir font-semibold text-[16px] xl:text-[18px] text-[#21527D] border border-[#21527D] px-2.5 xl:px-5 py-2 rounded-[10px]"
+              className="font-avenir font-semibold text-[16px] xl:text-[18px] text-white border border-[#21527D] px-2.5 lg:px-10 py-2 rounded-[10px] bg-[#21527D] hover:opacity-90 transition cursor-pointer"
             >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              className="font-avenir font-semibold text-[16px] xl:text-[18px] text-white bg-[#21527D] px-2.5 xl:px-5 py-2 rounded-[10px]"
-            >
-              Sign up
+              Sign In
             </Link>
           </div>
 
@@ -293,13 +287,7 @@ const DemoNavbar = () => {
               to="/signin"
               className="w-full text-center font-avenir font-semibold text-[18px] text-[#21527D] border border-[#21527D] py-3 rounded-[10px]"
             >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              className="w-full text-center font-avenir font-semibold text-[18px] text-white bg-[#21527D] py-3 rounded-[10px]"
-            >
-              Sign up
+              Sign In
             </Link>
           </div>
         </div>

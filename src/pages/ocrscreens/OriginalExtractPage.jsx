@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import MenuIcon from '../../assets/icons/uploadpage/MenuIcon';
 import HomeIcon from '../../assets/icons/uploadpage/HomeIcon';
 import CloseIcon from '../../assets/icons/loginpages/CloseIcon';
@@ -22,6 +22,36 @@ import Navbar from '../landingpages/Navbar';
 const OriginalExtractPage = () => {
     const [showExportPopup, setShowExportPopup] = useState(false);
     const [open, setOpen] = useState(false);
+    
+    // Add zoom states for both original and extracted sections
+    const [originalZoom, setOriginalZoom] = useState(100);
+    const [extractedZoom, setExtractedZoom] = useState(100);
+
+    // Zoom functions for original section
+    const handleOriginalZoomIn = () => {
+        if (originalZoom < 200) {
+            setOriginalZoom(prev => Math.min(prev + 10, 200));
+        }
+    };
+
+    const handleOriginalZoomOut = () => {
+        if (originalZoom > 20) {
+            setOriginalZoom(prev => Math.max(prev - 10, 20));
+        }
+    };
+
+    // Zoom functions for extracted section
+    const handleExtractedZoomIn = () => {
+        if (extractedZoom < 200) {
+            setExtractedZoom(prev => Math.min(prev + 10, 200));
+        }
+    };
+
+    const handleExtractedZoomOut = () => {
+        if (extractedZoom > 20) {
+            setExtractedZoom(prev => Math.max(prev - 10, 20));
+        }
+    };
 
     useEffect(() => {
         console.log('Popup states:', {
@@ -65,10 +95,11 @@ const OriginalExtractPage = () => {
             document.body.style.overflow = "";
         };
     }, [showExportPopup, open]);
+    
     return (
         <div>
             <Navbar />
-            <div className="bg-white p-4 sm:p-6 md:p-8 lg:p-10 mb-20">
+            <div className="bg-white p-4 sm:p-6 md:p-8 lg:p-10">
                 {/* Overlay */}
                 {open && (
                     <div
@@ -79,7 +110,7 @@ const OriginalExtractPage = () => {
 
                 {/* Main Content */}
                 <div className="flex flex-col lg:flex-row  gap-6 lg:gap-10 xl:gap-20 px-0 md:px-10 xl:px-30">
-                    {/* Left Column */}
+                    {/* Left Column - Original */}
                     <div className="lg:w-1/2 flex flex-col gap-4 sm:gap-5 mt-4 sm:mt-6 lg:mt-0">
                         {/* Preview Section */}
                         <div className="w-full h-auto min-h-[350px] sm:min-h-[400px] bg-[#E7EDF2] p-3 sm:p-4 md:p-5 rounded-[15px] sm:rounded-[20px] flex flex-col justify-center items-center">
@@ -91,20 +122,54 @@ const OriginalExtractPage = () => {
                             </div>
 
                             {/* Main Display Box */}
-                            <div className="w-full max-w-[400px] lg:max-w-full xl:max-w-[450px] h-[300px] md:h-[500px] rounded-[25px] bg-[#FDFDFD] shadow-[0px_-2px_4px_0px_#21527D1A] p-4 flex items-center justify-center">
-                                <PngIcon width={120} height={120} opacity={0.2} />
+                            <div className="w-full max-w-[400px] lg:max-w-full xl:max-w-[450px]
+                                h-[300px] md:h-[310px]
+                                rounded-[25px] bg-[#FDFDFD]
+                                shadow-[0px_-2px_4px_0px_#21527D1A]
+                                p-4 relative overflow-auto scrollbar-hide">
+
+                                {/* Content with zoom */}
+                                <div className="relative z-10 min-h-full">
+                                    <div 
+                                        style={{
+                                            fontSize: `${originalZoom}%`,
+                                            lineHeight: '1.6',
+                                            transition: 'font-size 0.3s ease'
+                                        }}
+                                    >
+                                        <p className="font-avenir text-[#000000]">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
+                                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+                                            veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                                            commodo consequat.
+                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempora aperiam perspiciatis voluptatum rerum architecto laborum error voluptates perferendis nostrum inventore.
+                                        </p>
+                                    </div>
+                                </div>
+
                             </div>
+
                         </div>
 
                         {/* Control Bar */}
                         <div className="w-full flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 sm:gap-4 px-3 sm:px-4 py-3 bg-[#E7EDF2] rounded-[12px] sm:rounded-[15px]">
                             {/* Left Zoom Controls */}
                             <div className="flex items-center gap-2 sm:gap-3 pr-3 sm:pr-4 border-r border-[#21527D]/20">
-                                <SearchMinusIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+                                <button 
+                                    onClick={handleOriginalZoomOut}
+                                    className="hover:opacity-80 transition-opacity"
+                                >
+                                    <SearchMinusIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+                                </button>
                                 <div className="w-[45px] sm:w-[50px] h-[28px] sm:h-[30px] flex items-center justify-center rounded-[6px] sm:rounded-[8px] bg-[#FFFFFF] text-[#21527D] font-avenir font-black text-[12px] sm:text-[14px] leading-[100%] opacity-[0.70]">
-                                    90%
+                                    {originalZoom}%
                                 </div>
-                                <SearchAddIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+                                <button 
+                                    onClick={handleOriginalZoomIn}
+                                    className="hover:opacity-80 transition-opacity"
+                                >
+                                    <SearchAddIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+                                </button>
                             </div>
 
                             {/* Pagination Section */}
@@ -127,7 +192,7 @@ const OriginalExtractPage = () => {
                         </div>
                     </div>
 
-                    {/* Right Column */}
+                    {/* Right Column - Extracted */}
                     <div className="lg:w-1/2 flex flex-col gap-4 sm:gap-5 mt-4 sm:mt-6 lg:mt-0">
                         {/* Preview Section */}
                         <div className="w-full h-auto min-h-[350px] sm:min-h-[400px] bg-[#E7EDF2] p-3 sm:p-4 md:p-5 rounded-[15px] sm:rounded-[20px] flex flex-col justify-center items-center">
@@ -138,17 +203,29 @@ const OriginalExtractPage = () => {
                                 </h2>
 
                                 {/* Right-side Button */}
-                                <button className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1 sm:py-2 font-avenir font-normal text-[14px] sm:text-[16px] leading-[26px] text-[#000000] bg-[#FCFBFB] rounded-[8px] sm:rounded-[10px] ml-auto hover:bg-[#f0f0f0] transition-colors">
+                                <button className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 font-avenir font-normal text-[14px] sm:text-[16px] leading-[26px] text-[#000000] bg-[#FCFBFB] rounded-[8px] sm:rounded-[10px] ml-auto">
                                     <EditIcon className="w-4 h-4 sm:w-5 sm:h-5" color="#000000" />
                                     <span>Edit</span>
                                 </button>
                             </div>
 
                             {/* Main Display Box */}
-                            <div className="scrollbar-hide w-full max-w-[400px] lg:max-w-full xl:max-w-[450px] h-[300px] md:h-[500px] rounded-[25px] bg-[#FDFDFD] shadow-[0px_-2px_4px_0px_#21527D1A] p-4 overflow-auto">
-                                <p className="font-avenir text-[14px] sm:text-[16px] leading-relaxed text-gray-700">
-                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum quaerat qui voluptate recusandae omnis repellat facilis, maxime et, temporibus aut delectus. Debitis quas, nostrum quae eveniet ea, dolorum repudiandae suscipit et esse dignissimos omnis maxime reprehenderit tempore at dolores. Excepturi repellat pariatur minima dignissimos nobis velit tenetur saepe similique dolor!
-                                </p>
+                            <div className="w-full max-w-[400px] lg:max-w-full xl:max-w-[450px]
+                                h-[300px] md:h-[310px]
+                                rounded-[25px] bg-[#FDFDFD]
+                                shadow-[0px_-2px_4px_0px_#21527D1A]
+                                p-4 relative overflow-auto scrollbar-hide">
+                                <div 
+                                    style={{
+                                        fontSize: `${extractedZoom}%`,
+                                        lineHeight: '1.6',
+                                        transition: 'font-size 0.3s ease'
+                                    }}
+                                >
+                                    <p className="font-avenir text-[#000000]">
+                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum quaerat qui voluptate recusandae omnis repellat facilis, maxime et, temporibus aut delectus. Debitis quas, nostrum quae eveniet ea, dolorum repudiandae suscipit et esse dignissimos omnis maxime reprehenderit tempore at dolores. Excepturi repellat pariatur minima dignissimos nobis velit tenetur saepe similique dolor!
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
@@ -156,11 +233,21 @@ const OriginalExtractPage = () => {
                         <div className="w-full flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 sm:gap-4 px-3 sm:px-4 py-3 bg-[#E7EDF2] rounded-[12px] sm:rounded-[15px]">
                             {/* Left Zoom Controls */}
                             <div className="flex items-center gap-2 sm:gap-3 pr-3 sm:pr-4 border-r border-[#21527D]/20">
-                                <SearchMinusIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+                                <button 
+                                    onClick={handleExtractedZoomOut}
+                                    className="hover:opacity-80 transition-opacity"
+                                >
+                                    <SearchMinusIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+                                </button>
                                 <div className="w-[45px] sm:w-[50px] h-[28px] sm:h-[30px] flex items-center justify-center rounded-[6px] sm:rounded-[8px] bg-[#FFFFFF] text-[#21527D] font-avenir font-black text-[12px] sm:text-[14px] leading-[100%] opacity-[0.70]">
-                                    90%
+                                    {extractedZoom}%
                                 </div>
-                                <SearchAddIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+                                <button 
+                                    onClick={handleExtractedZoomIn}
+                                    className="hover:opacity-80 transition-opacity"
+                                >
+                                    <SearchAddIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+                                </button>
                             </div>
 
                             {/* Pagination Section */}

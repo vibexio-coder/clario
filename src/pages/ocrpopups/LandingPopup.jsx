@@ -32,7 +32,7 @@ const LandingPopup = ({ closePopup }) => {
                 <div className="flex justify-center">
                     <button className="font-avenir font-bold text-[18px] sm:text-[24px] leading-[100%]
                                    text-[#FDFDFD] bg-[#21527D] w-[200px] sm:w-[280px] 
-                                   h-[50px] sm:h-[60px] rounded-[30px]">
+                                   h-[50px] sm:h-[60px] rounded-[30px] hover:opacity-90 transition cursor-pointer">
                         Subscribe Now
                     </button>
                 </div>
