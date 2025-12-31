@@ -89,7 +89,7 @@ const AllUsers = () => {
     };
 
     return (
-        <div className="h-full md:min-h-screen flex items-center justify-center py-1 md:py-0 bg-[#FAFDFF]">
+        <div className="h-full md:min-h-screen flex items-center justify-center py-1 md:py-0 bg-[#FAFDFF] overflow-y-auto">
             <div className="w-full max-w-[500px] bg-white shadow-[0px_0px_7px_0px_#00000040] md:rounded-[20px] px-10 py-8 flex flex-col gap-5">
 
                 {/* Logo */}
@@ -128,7 +128,7 @@ const AllUsers = () => {
                         </span>
 
                         {open && (
-                            <div className="absolute top-full mt-1 w-full rounded-[6px] bg-[#FDFDFD] border border-[#21527D] shadow-[0px_0px_7px_0px_#00000040] z-50 overflow-y-auto max-h-[200px] scrollbar-hide">
+                            <div className="absolute top-full mt-1 w-full rounded-[6px] bg-[#FDFDFD] border border-[#21527D] shadow-[0px_0px_7px_0px_#00000040] z-50 overflow-y-auto h-[100px] md:max-h-[200px] scrollbar-hide">
                                 <ul className="py-1">
                                     {["Invoice OCR", "Handwritten OCR", "ID / Document OCR", "Other"].map((item) => (
                                         <li

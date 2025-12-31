@@ -29,6 +29,9 @@ import AllUsers from './pages/signinsplitscreens/AllUsers';
 import Logout from './pages/ocrpopups/Logout';
 import DeleteAccount from './pages/ocrpopups/DeleteAccount';
 import Account from './pages/accountpages/Account';
+import Security from './pages/accountpages/Security';
+import Subscription from './pages/accountpages/Subscription';
+import BillingInvoices from './pages/accountpages/BillingInvoices';
 
 const App = () => {
   return (
@@ -60,6 +63,9 @@ const App = () => {
         <Route path="/logout" element={<Logout />} />
         <Route path="/deleteaccount" element={<DeleteAccount />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/security" element={<Security />} />
+        <Route path="/subscription" element={<Subscription />} />
+        <Route path="/billinginvoices" element={<BillingInvoices />} />
       </Routes>
     </div>
   );

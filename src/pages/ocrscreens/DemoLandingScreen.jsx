@@ -13,9 +13,7 @@ const DemoLandingScreen = () => {
                 <OcrWorksSection />
             </div>
             <Footer />
-            <div className='pb-15 lg:pb-0'>
-
-            </div>
+            
         </div>
     );
 }

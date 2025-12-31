@@ -146,7 +146,7 @@ const CreatePassword = () => {
                     </div>
 
                     <p className="font-avenir font-normal text-[10px] leading-[26px] tracking-[0%] text-[#21527D]">
-                        Use at least 8 characters with a mix of letters and numbers.
+                       Use at least 8 characters, including uppercase, lowercase , numbers and special characters.
                     </p>
 
                     {/* Error Message for password */}

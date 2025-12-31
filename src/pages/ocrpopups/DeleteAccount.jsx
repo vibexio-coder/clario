@@ -1,7 +1,7 @@
 import React from "react";
 import CloseIcon from "../../assets/icons/loginpages/CloseIcon";
 
-const DeleteAccount = () => {
+const DeleteAccount = ({ onClose }) => {
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/30 px-4">
       {/* Card */}
@@ -13,7 +13,9 @@ const DeleteAccount = () => {
         py-10"
       >
         {/* Close */}
-        <button className="absolute right-4 sm:right-6 top-4 sm:top-6">
+        <button
+          onClick={onClose}
+          className="absolute right-4 sm:right-6 top-4 sm:top-6 cursor-pointer">
           <CloseIcon />
         </button>
 
@@ -34,8 +36,7 @@ const DeleteAccount = () => {
             className="font-avenir font-semibold lg:font-bold text-[16px] leading-[100%]
             text-[#21527D] bg-[#FDFDFD]
             border border-[#21527D]
-            w-full sm:w-[220px] h-[40px] rounded-[10px]
-            hover:opacity-90 transition cursor-pointer"
+            w-full sm:w-[220px] h-[40px] rounded-[10px] cursor-pointer"
           >
             Cancel
           </button>
@@ -43,8 +44,7 @@ const DeleteAccount = () => {
           <button
             className="font-avenir font-semibold lg:font-bold text-[16px] leading-[100%]
             text-[#FDFDFD] bg-[#21527D]
-            w-full sm:w-[220px] h-[40px] rounded-[10px]
-            hover:opacity-90 transition cursor-pointer"
+            w-full sm:w-[220px] h-[40px] rounded-[10px] cursor-pointer"
           >
             Yes, Delete my Account
           </button>

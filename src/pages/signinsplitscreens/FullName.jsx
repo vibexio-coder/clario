@@ -132,7 +132,7 @@ const FullName = () => {
 
                 <div>
                     {/* Title */}
-                    <h2 className="font-kollektif font-semibold lg:font-bold text-[24px] leading-[26px] text-[#21527D] mb-1">
+                    <h2 className="font-kollektif font-semibold lg:font-bold text-[20px] md:text-[24px] leading-[26px] text-[#21527D] mb-1">
                         Create your Clario account
                     </h2>
                     <p className="font-avenir font-normal text-[16px] leading-[26px] tracking-[0%] text-black">

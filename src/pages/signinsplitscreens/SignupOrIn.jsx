@@ -142,7 +142,7 @@ const SignupOrIn = () => {
                 Don't have an account?{" "}
                 <span
                     onClick={() => navigate("/fullname")}
-                    className="text-[#21527D] font-bold cursor-pointer hover:underline"
+                    className="text-[#21527D] font-semibold lg:font-bold cursor-pointer hover:underline"
                 >
                     Create one
                 </span>

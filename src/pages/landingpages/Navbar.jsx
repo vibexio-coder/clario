@@ -3,8 +3,9 @@ import icon from "../../assets/images/icon.webp";
 import DownArrowIcon from "../../assets/icons/DownArrowIcon";
 import UserIcon from "../../assets/icons/UserIcon";
 import { Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import RotateArrowIcon from "../../assets/icons/accountpage/RotateArrowIcon";
+import Logout from "../ocrpopups/Logout";
 
 const NAV_ITEMS = {
     Product: [
@@ -22,7 +23,7 @@ const NAV_ITEMS = {
         { label: "Custom AI Workflows", to: "/solutions/custom-ai" },
     ],
     Company: [
-        { label: "About Vibexio", to: "/about" },
+        { label: "About Vibexio", to: "https://www.vibexio.ai/" },
         { label: "Careers", to: "/careers" },
         { label: "Contact", to: "/contact" },
         { label: "Privacy Policy", to: "/privacy-policy" },
@@ -39,10 +40,10 @@ const NAV_ITEMS = {
 
 const USER_MENU = [
     { label: "Account", to: "/account" },
-    { label: " Profile", to: "/profile" },
+    { label: " Profile", to: "/account" },
     { label: " Security", to: "/security" },
     { label: "Subscription", to: "/subscription" },
-    { label: "Billing & Invoices", to: "/invoice" },
+    { label: "Billing & Invoices", to: "/billinginvoices" },
     { label: "Help & Support", to: "/accountpage" },
     {
         label: "Logout",
@@ -56,6 +57,8 @@ const Navbar = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [mobileExpanded, setMobileExpanded] = useState(null);
     const [userOpen, setUserOpen] = useState(false);
+    const [showLogoutPopup, setShowLogoutPopup] = useState(false);
+    const navigate = useNavigate();
 
     const dropdownRef = useRef(null);
     const userDropdownRef = useRef(null);
@@ -86,7 +89,7 @@ const Navbar = () => {
     // Handle desktop dropdown hover
     const handleDropdownEnter = (title) => {
         setActiveDropdown(title);
-        setUserOpen(false); // Close user dropdown when opening nav dropdown
+        setUserOpen(false);
     };
 
     const handleDropdownLeave = () => {
@@ -108,6 +111,25 @@ const Navbar = () => {
         setMobileExpanded(mobileExpanded === title ? null : title);
     };
 
+    const handleLogoutClick = (isMobile = false) => {
+        if (isMobile) {
+            closeMobileMenu();
+        } else {
+            setUserOpen(false);
+        }
+        setShowLogoutPopup(true);
+    };
+
+    const handleLogoutConfirm = () => {
+        setShowLogoutPopup(false);
+        // Add your logout logic here
+        navigate("/");
+    };
+    const handleLogoutCancel = () => {
+        setShowLogoutPopup(false);
+    };
+
+
     // Close mobile menu
     const closeMobileMenu = () => {
         setMobileOpen(false);
@@ -125,7 +147,7 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="w-full bg-white shadow-[0px_1px_7px_0px_#00000040] sticky top-0 z-50">
+        <nav className="w-full bg-white shadow-[0px_1px_7px_0px_#00000040] sticky top-0 z-40">
             <div className="w-full px-4 sm:px-6 lg:px-12">
                 {/* Main navigation container */}
                 <div className="flex items-center justify-between h-16 lg:h-20">
@@ -216,7 +238,7 @@ const Navbar = () => {
                         </button>
 
                         {userOpen && (
-                            <div className="absolute left-1/2 transform -translate-x-1/2 top-full pt-1 z-50">
+                            <div className="absolute left-1/2 transform -translate-x-1/2 top-full pt-1 z-50 overflow-scroll scrollbar-hide">
                                 <div className="bg-[#E7EDF2] border border-[#BCD6EB] rounded-[10px]
       shadow-[0px_0px_5px_0px_#00000040] min-w-[220px] py-1">
 
@@ -241,14 +263,11 @@ const Navbar = () => {
                                                 ) : item.action === "logout" ? (
                                                     /* 🔹 LOGOUT (STYLE UNCHANGED) */
                                                     <button
-                                                        onClick={() => {
-                                                            setUserOpen(false);
-                                                            navigate("/logout"); // ✅ correct route
-                                                        }}
+                                                        onClick={() => handleLogoutClick(false)}
                                                         className="flex items-center w-full px-6 py-3.5
-                font-avenir font-semibold text-[16px]
-                leading-[24px] text-[#464646]
-                hover:bg-[#DEE6ED] transition-colors gap-3"
+                                                    font-avenir font-semibold text-[16px]
+                                                    leading-[24px] text-[#464646]
+                                                    hover:bg-[#DEE6ED] transition-colors gap-3"
                                                     >
                                                         {item.Icon && <item.Icon width={30} height={30} />}
                                                         <span>{item.label}</span>
@@ -260,7 +279,7 @@ const Navbar = () => {
                                                         onClick={() => setUserOpen(false)}
                                                         className="block px-6 py-3.5
                 font-avenir font-semibold text-[16px]
-                leading-[24px] text-[#464646]
+                leading-6 text-[#464646]
                 hover:bg-[#DEE6ED] transition-colors"
                                                     >
                                                         {item.label}
@@ -367,15 +386,12 @@ const Navbar = () => {
                                     <div key={index}>
                                         {item.action === "logout" ? (
                                             <button
-                                                onClick={() => {
-                                                    // Handle logout logic here
-                                                    console.log("Logout clicked");
-                                                    closeMobileMenu();
-                                                }}
+                                                onClick={() => handleLogoutClick(true)}
                                                 className="flex items-center w-full px-4 py-3 font-avenir font-medium gap-3
-          text-[16px] text-[#464646] rounded-lg 
-          hover:bg-gray-100 transition-colors"
+                                                text-[16px] text-[#464646] rounded-lg 
+                                                hover:bg-gray-100 transition-colors"
                                             >
+
                                                 {item.Icon && <item.Icon width={30} height={30} />}
                                                 <span className="font-avenir font-medium text-[20px] leading-[1.2] tracking-[0.04em] capitalize text-[#21527D]">
                                                     {item.label}
@@ -399,6 +415,12 @@ const Navbar = () => {
                     </div>
                 </div>
             </div>
+            {showLogoutPopup && (
+                <Logout
+                    onConfirm={handleLogoutConfirm}
+                    onCancel={handleLogoutCancel}
+                />
+            )}
         </nav>
     );
 };

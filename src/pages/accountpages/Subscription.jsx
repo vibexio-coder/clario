@@ -1,132 +1,55 @@
 import React from 'react';
-import PlusCircleIcon from '../../assets/icons/accountpage/PlusCircleIcon';
-import RotateArrowIcon from '../../assets/icons/accountpage/RotateArrowIcon';
-import TrashIcon from '../../assets/icons/accountpage/TrashIcon';
+import Navbar from '../landingpages/Navbar';
 
 const Subscription = () => {
     return (
         <div>
-            <h1 className='font-avenir font-semibold lg:font-bold text-[20px] lg:text-[24px] leading-[26px] tracking-[0] text-[#21527D] mb-5'>
-                SUBSCRIPTION
-            </h1>
-
-            <div className="
-                w-full 
-                flex flex-col md:flex-row 
-                justify-between 
-                items-start
-                gap-6 
-                py-8 md:py-10 
-                px-5 md:px-10 
-                shadow-[0px_0px_22.8px_2px_#57575740] 
-                bg-[#FDFDFD] 
-                rounded-[20px]
-            ">
-
-                {/* LEFT SIDE */}
-                <h2 className="
-                    font-avenir font-semibold 
-                    text-[18px] md:text-[20px] 
-                    leading-[30px] md:leading-[50px] 
-                    tracking-[0.24em] 
-                    capitalize 
-                    text-[#121212]
-                    text-left
-                ">
-                    YOUR CURRENT PLAN IS <br />
-                    <span className='
-                        font-avenir font-semibold lg:font-bold 
-                        text-[26px] md:text-[30px] 
-                        leading-8 md:leading-10 
-                        tracking-[0.24em] 
-                        capitalize 
-                        text-[#21527D]
-                    '>
-                        Starter
-                    </span>
+            <Navbar/>
+            <div className="w-full px-4 sm:px-6 lg:px-8 py-5 lg:py-10">
+                {/* Header */}
+                <h2 className="font-avenir font-normal text-2xl sm:text-3xl lg:text-[32px] leading-[26px] text-[#21527D] mb-4 sm:mb-6">
+                    Subscription
                 </h2>
 
-                {/* RIGHT SIDE */}
-                <div className="flex flex-col items-start md:items-end gap-3 w-full md:w-auto">
+                <p className="font-avenir font-normal text-base sm:text-[15px] lg:text-[16px] leading-[26px] text-[#21527D] mb-4 sm:mb-6">
+                    Current plan
+                </p>
 
-                    {/* EXPIRY SECTION */}
-                    <div className="text-left bg-[#C5D4E2]/30 rounded-[10px] px-3 py-2 w-full md:w-auto">
-                        <div className='font-avenir font-semibold text-[12px] leading-[25px] tracking-[0.25em] capitalize text-[#21527D]'>
-                            EXPIRES ON
-                        </div>
-                        <div className='font-avenir font-[750] text-[16px] leading-[25px] tracking-[0.24em] capitalize text-[#21527D]'>
-                            25 NOV 2025
-                        </div>
+                {/* Plan Card */}
+                <div className="bg-[#21527D] shadow-[0px_0px_4px_0px_#00000040] rounded-[20px] p-5 sm:p-6 md:p-8 max-w-[350px]">
+                    {/* Plan Title */}
+                    <h2 className="font-avenir font-bold text-lg sm:text-xl md:text-[20px] leading-[100%] text-white mb-3 sm:mb-4">
+                        Starter Plan
+                    </h2>
+
+                    {/* Plan Details */}
+                    <div className="space-y-2 sm:space-y-3 mb-5 sm:mb-6">
+                        <p className="font-avenir font-[750] text-base sm:text-[15px] md:text-[16px] leading-[26px] text-white">
+                            <span className="font-normal">Usage:</span> 10 pages free per day
+                        </p>
+
+                        <p className="font-avenir font-normal text-base sm:text-[15px] md:text-[16px] leading-[26px] text-white/90">
+                            Expires on 25 Nov 2025
+                        </p>
                     </div>
 
-                    {/* BUTTONS */}
-                    <div className="flex flex-col sm:flex-row gap-5 mt-6 md:mt-10 w-full md:w-auto">
-                        <button className='
-                            w-full sm:w-[150px] 
-                            h-[45px] 
-                            font-avenir font-semibold 
-                            text-[16px] 
-                            leading-[100%] 
-                            tracking-[0] 
-                            text-[#FDFDFD] 
-                            bg-[#21527D] 
-                            rounded-[10px]
-                        '>
-                            Upgrade
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                        <button
+                            className="font-avenir font-bold text-xs sm:text-[12px] leading-[26px] text-white border border-white w-full sm:w-[140px] h-[36px] sm:h-[30px] rounded-[10px] cursor-pointer"
+                        >
+                            Deactivate
                         </button>
 
-                        <button className='
-                            w-full sm:w-[180px] 
-                            h-[45px] 
-                            font-avenir font-semibold 
-                            text-[16px] 
-                            leading-[100%] 
-                            tracking-[0] 
-                            text-[#D45757] 
-                            bg-[#FFF4F4] 
-                            border border-[0.25px] border-[#D45757] 
-                            rounded-[10px]
-                        '>
-                            Cancel Subscription
+                        <button
+                            className="font-avenir font-bold text-xs sm:text-[12px] leading-[26px] text-[#21527D] bg-white w-full sm:w-[140px] h-[36px] sm:h-[30px] rounded-[10px] cursor-pointer"
+                        >
+                            Change plan
                         </button>
                     </div>
-
                 </div>
-
-            </div>
-            <div className='flex flex-row flex-wrap gap-5 mt-10 justify-center'>
-
-                {/* LOGOUT */}
-                <button
-                    className="
-    w-full sm:w-[235px] h-[55px] md:h-[65px]
-    flex items-center justify-center gap-3
-    font-avenir font-[350] text-[20px] md:text-[24px]
-    leading-[100%] tracking-[0.09em] capitalize
-    text-[#21527D] bg-[#E9F5FF]
-    border border-[0.25px] border-[#21527D]
-    shadow-[0px_1px_4px_0px_#0000001A]
-    rounded-[100px]
-  "
-                >
-                    <RotateArrowIcon width={32} height={32} />
-                    Logout
-                </button>
-
-
-
-                {/* DELETE ACCOUNT */}
-                <button className='w-full sm:w-[235px] h-[55px] md:h-[65px] flex items-center justify-center gap-3 
-                font-avenir font-[350] text-[20px] md:text-[24px] leading-[100%] tracking-[0.09em] capitalize 
-                text-[#C62525] bg-[#FFF4F4] border border-[0.25px] border-[#D25B5C] 
-                shadow-[0px_1px_4px_0px_#0000001A] rounded-[100px]'>
-                    <TrashIcon width={32} height={32} />
-                    Delete
-                </button>
-
             </div>
         </div>
-
     );
 }
 

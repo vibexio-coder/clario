@@ -22,7 +22,7 @@ import Navbar from '../landingpages/Navbar';
 const OriginalExtractPage = () => {
     const [showExportPopup, setShowExportPopup] = useState(false);
     const [open, setOpen] = useState(false);
-    
+
     // Add zoom states for both original and extracted sections
     const [originalZoom, setOriginalZoom] = useState(100);
     const [extractedZoom, setExtractedZoom] = useState(100);
@@ -95,7 +95,7 @@ const OriginalExtractPage = () => {
             document.body.style.overflow = "";
         };
     }, [showExportPopup, open]);
-    
+
     return (
         <div>
             <Navbar />
@@ -130,7 +130,7 @@ const OriginalExtractPage = () => {
 
                                 {/* Content with zoom */}
                                 <div className="relative z-10 min-h-full">
-                                    <div 
+                                    <div
                                         style={{
                                             fontSize: `${originalZoom}%`,
                                             lineHeight: '1.6',
@@ -155,18 +155,22 @@ const OriginalExtractPage = () => {
                         <div className="w-full flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 sm:gap-4 px-3 sm:px-4 py-3 bg-[#E7EDF2] rounded-[12px] sm:rounded-[15px]">
                             {/* Left Zoom Controls */}
                             <div className="flex items-center gap-2 sm:gap-3 pr-3 sm:pr-4 border-r border-[#21527D]/20">
-                                <button 
+                                {/* Zoom Out Button - hidden at 20% */}
+                                <button
                                     onClick={handleOriginalZoomOut}
-                                    className="hover:opacity-80 transition-opacity"
+                                    className={`hover:opacity-80 transition-opacity ${originalZoom <= 20 ? 'invisible' : 'visible'}`}
                                 >
                                     <SearchMinusIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </button>
+
                                 <div className="w-[45px] sm:w-[50px] h-[28px] sm:h-[30px] flex items-center justify-center rounded-[6px] sm:rounded-[8px] bg-[#FFFFFF] text-[#21527D] font-avenir font-black text-[12px] sm:text-[14px] leading-[100%] opacity-[0.70]">
                                     {originalZoom}%
                                 </div>
-                                <button 
+
+                                {/* Zoom In Button - hidden at 200% */}
+                                <button
                                     onClick={handleOriginalZoomIn}
-                                    className="hover:opacity-80 transition-opacity"
+                                    className={`hover:opacity-80 transition-opacity ${originalZoom >= 200 ? 'invisible' : 'visible'}`}
                                 >
                                     <SearchAddIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </button>
@@ -215,7 +219,7 @@ const OriginalExtractPage = () => {
                                 rounded-[25px] bg-[#FDFDFD]
                                 shadow-[0px_-2px_4px_0px_#21527D1A]
                                 p-4 relative overflow-auto scrollbar-hide">
-                                <div 
+                                <div
                                     style={{
                                         fontSize: `${extractedZoom}%`,
                                         lineHeight: '1.6',
@@ -233,23 +237,26 @@ const OriginalExtractPage = () => {
                         <div className="w-full flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 sm:gap-4 px-3 sm:px-4 py-3 bg-[#E7EDF2] rounded-[12px] sm:rounded-[15px]">
                             {/* Left Zoom Controls */}
                             <div className="flex items-center gap-2 sm:gap-3 pr-3 sm:pr-4 border-r border-[#21527D]/20">
-                                <button 
+                                {/* Zoom Out Button - hidden at 20% */}
+                                <button
                                     onClick={handleExtractedZoomOut}
-                                    className="hover:opacity-80 transition-opacity"
+                                    className={`hover:opacity-80 transition-opacity ${extractedZoom <= 20 ? 'invisible' : 'visible'}`}
                                 >
                                     <SearchMinusIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </button>
+
                                 <div className="w-[45px] sm:w-[50px] h-[28px] sm:h-[30px] flex items-center justify-center rounded-[6px] sm:rounded-[8px] bg-[#FFFFFF] text-[#21527D] font-avenir font-black text-[12px] sm:text-[14px] leading-[100%] opacity-[0.70]">
                                     {extractedZoom}%
                                 </div>
-                                <button 
+
+                                {/* Zoom In Button - hidden at 200% */}
+                                <button
                                     onClick={handleExtractedZoomIn}
-                                    className="hover:opacity-80 transition-opacity"
+                                    className={`hover:opacity-80 transition-opacity ${extractedZoom >= 200 ? 'invisible' : 'visible'}`}
                                 >
                                     <SearchAddIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </button>
                             </div>
-
                             {/* Pagination Section */}
                             <div className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 border-r border-[#21527D]/20">
                                 <LeftPaginationArrowIcon className="w-4 h-4 sm:w-5 sm:h-5" />

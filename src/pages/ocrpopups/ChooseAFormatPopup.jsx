@@ -10,9 +10,9 @@ const ChooseAFormatPopup = ({ closePopup, openExtracting }) => {
     };
 
     return (
-        <div className="w-full max-w-[400px] rounded-[40px]
+        <div className="w-[90%] max-w-[400px] rounded-[40px]
                     shadow-[0px_16px_25.2px_7px_#1A55701A]
-                    p-6 sm:p-10 bg-[#FDFDFD]
+                    p-10 bg-[#FDFDFD]
                     relative flex flex-col items-center gap-6">
 
             {/* Close Button */}
