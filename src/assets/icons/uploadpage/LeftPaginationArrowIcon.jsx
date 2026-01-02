@@ -25,4 +25,5 @@ const LeftPaginationArrowIcon = ({
   );
 };
 
+
 export default LeftPaginationArrowIcon;

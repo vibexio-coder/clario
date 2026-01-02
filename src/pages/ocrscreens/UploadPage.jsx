@@ -26,7 +26,7 @@ const UploadPage = () => {
     const [showExtractingPopup, setShowExtractingPopup] = useState(false);
 
     // New state variables for the features
-    const [zoomLevel, setZoomLevel] = useState(100); // Default zoom 100%
+    const [zoomLevel, setZoomLevel] = useState(100);
     const [isCropping, setIsCropping] = useState(false);
     const [rotation, setRotation] = useState(0);
     const [isTextDeleted, setIsTextDeleted] = useState(false);
@@ -43,6 +43,7 @@ const UploadPage = () => {
     const [uploadProgress, setUploadProgress] = useState({});
     const [uploadStatus, setUploadStatus] = useState({});
     const [totalPages, setTotalPages] = useState(0);
+    const [ocrType, setOcrType] = useState(null);
 
     // Allowed file types
     const ALLOWED_TYPES = [
@@ -64,68 +65,17 @@ const UploadPage = () => {
         'jpeg': JpegIcon
     };
 
-    // Load files from localStorage on component mount
-    useEffect(() => {
-        const savedFiles = localStorage.getItem('uploadedFiles');
-        if (savedFiles) {
-            try {
-                const parsed = JSON.parse(savedFiles);
-                // Convert base64 strings back to File objects
-                const filesWithObjects = parsed.map(fileData => {
-                    // Convert base64 back to File
-                    const byteCharacters = atob(fileData.base64.split(',')[1]);
-                    const byteNumbers = new Array(byteCharacters.length);
-                    for (let i = 0; i < byteCharacters.length; i++) {
-                        byteNumbers[i] = byteCharacters.charCodeAt(i);
-                    }
-                    const byteArray = new Uint8Array(byteNumbers);
-                    const file = new File([byteArray], fileData.name, { type: fileData.type });
-                    
-                    // Get the icon component
-                    const fileExtension = fileData.name.split('.').pop().toLowerCase();
-                    const IconComponent = fileIconMap[fileExtension] || PdfIcon;
-                    
-                    return {
-                        id: fileData.id,
-                        name: fileData.name,
-                        file: file,
-                        Icon: IconComponent,
-                        progress: 100,
-                        status: 'uploaded',
-                        pageCount: fileData.pageCount || 1
-                    };
-                });
-                
-                setUploadedFiles(filesWithObjects);
-                setTotalPages(parsed.reduce((sum, file) => sum + (file.pageCount || 1), 0));
-            } catch (error) {
-                console.error('Error loading saved files:', error);
-            }
+    // Helper function to convert base64 back to File
+    const base64ToFile = (base64Data, filename, mimeType) => {
+        const arr = base64Data.split(',');
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
         }
-    }, []);
-
-    // Save files to localStorage whenever uploadedFiles changes
-    useEffect(() => {
-        if (uploadedFiles.length > 0) {
-            // Convert File objects to base64 for storage
-            const savePromises = uploadedFiles.map(async (file) => {
-                const base64 = await fileToBase64(file.file);
-                return {
-                    id: file.id,
-                    name: file.name,
-                    type: file.file.type,
-                    base64: base64,
-                    pageCount: file.pageCount || 1
-                };
-            });
-            
-            Promise.all(savePromises).then(filesToSave => {
-                localStorage.setItem('uploadedFiles', JSON.stringify(filesToSave));
-            });
-        } else {
-            localStorage.removeItem('uploadedFiles');
-        }
-    }, [uploadedFiles]);
+        return new File([u8arr], filename, { type: mimeType });
+    };
 
     // Helper function to convert File to base64
     const fileToBase64 = (file) => {
@@ -136,6 +86,119 @@ const UploadPage = () => {
             reader.onerror = error => reject(error);
         });
     };
+
+    // ✅ CRITICAL FUNCTION: Save current state to sync storage
+    const saveToSyncStorage = async (filesArray) => {
+        if (filesArray.length === 0) {
+            // Clear both storages if no files
+            localStorage.removeItem('uploadPageFiles');
+            localStorage.removeItem('originalExtractFiles');
+            return;
+        }
+
+        try {
+            // Convert File objects to base64 for storage
+            const savePromises = filesArray.map(async (file) => {
+                const base64 = await fileToBase64(file.file);
+                return {
+                    id: file.id,
+                    name: file.name,
+                    type: file.file.type,
+                    base64: base64,
+                    size: file.file.size,
+                    lastModified: file.file.lastModified,
+                    pageCount: file.pageCount || 1
+                };
+            });
+            
+            const filesToSave = await Promise.all(savePromises);
+            
+            // ✅ Save to BOTH storage locations with SAME data
+            localStorage.setItem('uploadPageFiles', JSON.stringify(filesToSave));
+            localStorage.setItem('originalExtractFiles', JSON.stringify(filesToSave));
+            
+        } catch (error) {
+            console.error('Error saving to sync storage:', error);
+        }
+    };
+
+    // Load files from localStorage on component mount
+    useEffect(() => {
+        const loadFilesFromStorage = () => {
+            // Check for files from InvoiceDoc.jsx FIRST
+            const invoiceDocFiles = localStorage.getItem('invoiceDocFiles');
+            const currentOCRType = localStorage.getItem('currentOCRType');
+            
+            // Check for existing uploadPageFiles
+            const existingUploadPageFiles = localStorage.getItem('uploadPageFiles');
+            
+            let filesToLoad = [];
+            
+            if (existingUploadPageFiles) {
+                // Load existing uploadPageFiles (already in sync with OriginalExtractPage)
+                try {
+                    const parsedFiles = JSON.parse(existingUploadPageFiles);
+                    filesToLoad = [...filesToLoad, ...parsedFiles];
+                } catch (error) {
+                    console.error('Error loading existing files:', error);
+                }
+            } else if (invoiceDocFiles) {
+                // First time loading from InvoiceDoc
+                try {
+                    const parsedFiles = JSON.parse(invoiceDocFiles);
+                    filesToLoad = [...filesToLoad, ...parsedFiles];
+                    
+                    // Immediately save to sync storage for OriginalExtractPage
+                    localStorage.setItem('uploadPageFiles', JSON.stringify(parsedFiles));
+                    localStorage.setItem('originalExtractFiles', JSON.stringify(parsedFiles));
+                    
+                    // Clean up InvoiceDoc storage
+                    localStorage.removeItem('invoiceDocFiles');
+                    
+                } catch (error) {
+                    console.error('Error loading InvoiceDoc files:', error);
+                }
+            }
+            
+            // Process loaded files
+            if (filesToLoad.length > 0) {
+                const filesWithObjects = filesToLoad.map(fileData => {
+                    const file = base64ToFile(fileData.base64, fileData.name, fileData.type);
+                    
+                    // Get the icon component
+                    const fileExtension = fileData.name.split('.').pop().toLowerCase();
+                    const IconComponent = fileIconMap[fileExtension] || PdfIcon;
+                    
+                    return {
+                        id: fileData.id || Date.now() + Math.random(),
+                        name: fileData.name,
+                        file: file,
+                        Icon: IconComponent,
+                        progress: 100,
+                        status: 'uploaded',
+                        pageCount: fileData.pageCount || 1
+                    };
+                });
+                
+                // Set files in state
+                setUploadedFiles(filesWithObjects);
+                setTotalPages(filesWithObjects.reduce((sum, file) => sum + file.pageCount, 0));
+            }
+            
+            // Get OCR type
+            if (currentOCRType) {
+                setOcrType(currentOCRType);
+                localStorage.removeItem('currentOCRType');
+            }
+        };
+
+        loadFilesFromStorage();
+    }, []);
+
+    // ✅ Save to sync storage whenever uploadedFiles changes
+    useEffect(() => {
+        saveToSyncStorage(uploadedFiles);
+    }, [uploadedFiles]);
 
     // Handle Add Files button click
     const handleAddFiles = () => {
@@ -154,6 +217,17 @@ const UploadPage = () => {
                     continue;
                 }
                 
+                // Check for duplicate file
+                const isDuplicate = uploadedFiles.some(uploadedFile => 
+                    uploadedFile.name === file.name && 
+                    uploadedFile.file.size === file.size
+                );
+                
+                if (isDuplicate) {
+                    alert(`File "${file.name}" is already uploaded.`);
+                    continue;
+                }
+                
                 // Generate a unique ID for the file
                 const fileId = Date.now() + index;
                 
@@ -162,16 +236,14 @@ const UploadPage = () => {
                 const IconComponent = fileIconMap[fileExtension] || PdfIcon;
                 
                 // Calculate page count based on file type
-                let pageCount = 1; // Default for images
+                let pageCount = 1;
                 
                 if (file.type === 'application/pdf') {
-                    // For PDFs, simulate extracting page count (in real app, you'd use a PDF library)
-                    // Using a random number between 1-20 for demonstration
                     pageCount = Math.floor(Math.random() * 20) + 1;
                 }
                 
                 // Add file to uploaded files list
-                setUploadedFiles(prev => [...prev, {
+                const newFile = {
                     id: fileId,
                     name: file.name,
                     file: file,
@@ -179,9 +251,9 @@ const UploadPage = () => {
                     progress: 0,
                     status: 'uploading',
                     pageCount: pageCount
-                }]);
+                };
                 
-                // Update total pages
+                setUploadedFiles(prev => [...prev, newFile]);
                 setTotalPages(prev => prev + pageCount);
                 
                 // Start upload simulation
@@ -196,27 +268,25 @@ const UploadPage = () => {
     const simulateUpload = (fileId) => {
         let progress = 0;
         const interval = setInterval(() => {
-            progress += Math.random() * 5; // Increase by 0-5% each interval
+            progress += Math.random() * 5;
             if (progress >= 100) {
                 progress = 100;
                 clearInterval(interval);
                 
-                // Update status to completed
                 setUploadStatus(prev => ({
                     ...prev,
                     [fileId]: 'Uploaded'
                 }));
             }
             
-            // Update progress
             setUploadProgress(prev => ({
                 ...prev,
                 [fileId]: progress
             }));
-        }, 200); // Update every 200ms
+        }, 200);
     };
 
-    // Handle file deletion
+    // ✅ Handle file deletion from left side file list
     const handleDeleteFile = (fileId) => {
         const fileToDelete = uploadedFiles.find(file => file.id === fileId);
         if (fileToDelete) {
@@ -224,6 +294,7 @@ const UploadPage = () => {
             setTotalPages(prev => prev - (fileToDelete.pageCount || 1));
         }
         
+        // Remove from state
         setUploadedFiles(prev => prev.filter(file => file.id !== fileId));
         
         // If we're deleting the currently previewed file
@@ -261,24 +332,22 @@ const UploadPage = () => {
         });
     };
 
-    // Delete function (soft delete)
+    // ✅ Delete function (right side delete icon)
     const handleDelete = () => {
         setIsTextDeleted(true);
+        
+        // If there's a current preview file, delete it
+        if (currentPreviewFile) {
+            handleDeleteFile(currentPreviewFile.id);
+        }
     };
 
     // Crop functions - simplified
     const handleCropStart = () => {
-        setIsCropping(!isCropping); // Toggle crop mode
+        setIsCropping(!isCropping);
         if (!isCropping) {
-            // Set initial crop area to cover most of the content
             setCropArea({ x: 50, y: 50, width: 300, height: 200 });
         }
-    };
-
-    const handleCropApply = () => {
-        setIsCropping(false);
-        // Crop logic would go here
-        console.log("Crop area selected:", cropArea);
     };
 
     // Mouse event handlers for crop area
@@ -355,16 +424,10 @@ const UploadPage = () => {
         }
     }, [isDragging, cropResizeMode, dragStart]);
 
+    // Handle popup scroll lock/unlock
     useEffect(() => {
-        console.log('Popup states:', {
-            chooseFormat: showChooseFormatPopup,
-            extracting: showExtractingPopup
-        });
-
         if (showChooseFormatPopup || showExtractingPopup) {
             const scrollY = window.scrollY;
-            console.log('Saving scroll position:', scrollY);
-
             document.body.style.position = "fixed";
             document.body.style.top = `-${scrollY}px`;
             document.body.style.left = "0";
@@ -373,8 +436,6 @@ const UploadPage = () => {
             document.body.style.overflow = "hidden";
         } else {
             const scrollY = document.body.style.top;
-            console.log('Restoring from:', scrollY);
-
             document.body.style.position = "";
             document.body.style.top = "";
             document.body.style.left = "";
@@ -388,7 +449,6 @@ const UploadPage = () => {
         }
 
         return () => {
-            console.log('Cleanup running');
             document.body.style.position = "";
             document.body.style.top = "";
             document.body.style.left = "";
@@ -397,60 +457,6 @@ const UploadPage = () => {
             document.body.style.overflow = "";
         };
     }, [showChooseFormatPopup, showExtractingPopup]);
-
-    const fileList = [
-        { id: 1, name: "File.pdf", Icon: PdfIcon },
-        { id: 2, name: "File.jpeg", Icon: JpegIcon },
-        { id: 3, name: "File.png", Icon: PngIcon },
-        { id: 4, name: "File.webp", Icon: WebpIcon },
-        { id: 5, name: "File.jpg", Icon: JpgIcon },
-        { id: 6, name: "File.svg", Icon: SvgIcon },
-    ];
-
-    const [showPopup, setShowPopup] = useState(false);
-
-    useEffect(() => {
-        console.log('showPopup changed:', showPopup);
-
-        if (showPopup) {
-            const scrollY = window.scrollY;
-            console.log('Saving scroll position:', scrollY);
-
-            document.body.style.position = "fixed";
-            document.body.style.top = `-${scrollY}px`;
-            document.body.style.left = "0";
-            document.body.style.right = "0";
-            document.body.style.width = "100%";
-            document.body.style.overflow = "hidden";
-        } else {
-            const scrollY = document.body.style.top;
-            console.log('Restoring from:', scrollY);
-
-            document.body.style.position = "";
-            document.body.style.top = "";
-            document.body.style.left = "";
-            document.body.style.right = "";
-            document.body.style.width = "";
-            document.body.style.overflow = "";
-
-            if (scrollY) {
-                window.scrollTo(0, parseInt(scrollY || "0") * -1);
-            }
-        }
-
-        return () => {
-            console.log('Cleanup running');
-            document.body.style.position = "";
-            document.body.style.top = "";
-            document.body.style.left = "";
-            document.body.style.right = "";
-            document.body.style.width = "";
-            document.body.style.overflow = "";
-        };
-    }, [showPopup]);
-
-    // Original text content (fallback when no file is uploaded)
-    const originalText = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit soluta provident doloremque, sit ad eius dolorum omnis? Ducimus dolore mollitia repellendus laboriosam ut doloribus, nulla temporibus placeat illo ratione adipisci maxime fugit beatae, illum eaque eveniet fuga. Cum ullam ratione debitis eum architecto. Quod porro animi dolore rem, optio numquam.";
 
     // Render preview content based on file type
     const renderPreviewContent = () => {
@@ -467,7 +473,6 @@ const UploadPage = () => {
         const isPDF = file.type === 'application/pdf';
 
         if (isImage) {
-            // For images, show the image preview with zoom functionality
             const imageUrl = URL.createObjectURL(file);
             return (
                 <div className="h-full w-full flex items-center justify-center overflow-hidden">
@@ -483,10 +488,8 @@ const UploadPage = () => {
                 </div>
             );
         } else if (isPDF) {
-            // For PDFs, show only text content and page count
             return (
                 <div className="h-full w-full flex flex-col">
-                    {/* PDF content area - showing only text */}
                     <div 
                         ref={textContainerRef}
                         className="flex-1 overflow-auto scrollbar-hide"
@@ -505,7 +508,6 @@ const UploadPage = () => {
                             }}
                             className='scrollbar-hide overflow-auto h-full'
                         >
-                            {/* PDF text content - only shown when PDF is uploaded */}
                             <div className="text-gray-800">
                                 <p className="mb-3">PDF Document Content (Page 1)</p>
                                 <p className="mb-3">This is the extracted text from the uploaded PDF file.</p>
@@ -515,12 +517,10 @@ const UploadPage = () => {
                             </div>
                         </div>
                     </div>
-                    
                 </div>
             );
         }
 
-        // For other file types or fallback
         return (
             <div className="h-full w-full flex items-center justify-center">
                 <div className="text-gray-500">Preview not available for this file type</div>
@@ -536,29 +536,22 @@ const UploadPage = () => {
                 <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 xl:gap-20 px-0 xl:px-20">
                     {/* Left Column */}
                     <div className="lg:w-1/2 flex flex-col gap-6 md:gap-8">
-
-                        <div className="bg-[#FDFDFD] rounded-[20px] shadow-[0px_3px_6.9px_2px_#6C5E5E26]
-                p-5 h-[550px] flex flex-col overflow-hidden">
-
+                        <div className="bg-[#FDFDFD] rounded-[20px] shadow-[0px_3px_6.9px_2px_#6C5E5E26] p-5 h-[550px] flex flex-col overflow-hidden">
                             {/* Add Files Button */}
                             <div className="flex justify-center mb-4">
                                 <button
                                     type="button"
                                     onClick={handleAddFiles}
-                                    className="w-[200px] md:w-[280px] h-[40px] md:h-[55px] bg-[#21527D] rounded-[10px]
-                 flex items-center justify-center gap-2
-                 font-avenir font-semibold md:font-bold text-[18px] md:text-[20px] leading-[100%]
-                 text-[#FDFDFD] cursor-pointer"
+                                    className="w-[200px] md:w-[280px] h-[40px] md:h-[55px] bg-[#21527D] rounded-[10px] flex items-center justify-center gap-2 font-avenir font-semibold md:font-bold text-[18px] md:text-[20px] leading-[100%] text-[#FDFDFD] cursor-pointer"
                                 >
                                     <PlusIcon width={20} height={20} />
                                     <span>Add Files</span>
                                 </button>
                             </div>
 
-                            {/* File List (Scroll Only Here) */}
+                            {/* File List */}
                             <div className="flex-1 overflow-y-auto pr-2 custom-scroll">
                                 <div className="flex flex-col gap-4">
-                                    {/* Display uploaded files only */}
                                     {uploadedFiles.length === 0 ? (
                                         <div className="flex items-center justify-center h-full min-h-[200px]">
                                             <p className="font-avenir text-[14px] text-gray-500 italic">
@@ -573,35 +566,24 @@ const UploadPage = () => {
                                             return (
                                                 <div
                                                     key={file.id}
-                                                    className="bg-[#C5D4E2]/70 rounded-[20px]
-                     flex items-center gap-4
-                     px-4 py-3 md:px-5 md:py-4 cursor-pointer hover:bg-[#C5D4E2]/90 transition-colors"
+                                                    className="bg-[#C5D4E2]/70 rounded-[20px] flex items-center gap-4 px-4 py-3 md:px-5 md:py-4 cursor-pointer hover:bg-[#C5D4E2]/90 transition-colors"
                                                     onClick={() => setCurrentPreviewIndex(uploadedFiles.findIndex(f => f.id === file.id))}
                                                 >
                                                     <file.Icon width={40} height={40} color="#21527D" opacity={1} />
-
-                                                    {/* File Info */}
                                                     <div className="flex-1">
-                                                        {/* Display uploaded file name exactly here */}
                                                         <h2 className="font-avenir font-bold text-[12px] text-black">
                                                             {file.name}
                                                         </h2>
-
-                                                        {/* Progress bar with dynamic width */}
                                                         <div className="w-full max-w-[200px] h-[3px] bg-white rounded-[10px] mt-2">
                                                             <div
                                                                 className="h-full bg-[#21527D] rounded-[10px] transition-all duration-200"
                                                                 style={{ width: `${progress}%` }}
                                                             />
                                                         </div>
-
-                                                        {/* Status text with percentage */}
                                                         <p className="font-avenir text-[10px] text-black mt-1">
                                                             {progress < 100 ? `Uploading... ${Math.round(progress)}%` : 'Uploaded'}
                                                         </p>
                                                     </div>
-
-                                                    {/* Actions */}
                                                     <div className="flex items-center gap-3">
                                                         <button 
                                                             onClick={(e) => {
@@ -619,7 +601,6 @@ const UploadPage = () => {
                                     )}
                                 </div>
                             </div>
-
                         </div>
                     </div>
 
@@ -627,7 +608,6 @@ const UploadPage = () => {
                     <div className="w-full lg:w-1/2 flex flex-col gap-5 mt-6 lg:mt-0 px-2 md:px-0">
                         {/* Preview Section */}
                         <div className="w-full h-auto bg-[#E7EDF2] p-4 md:p-5 rounded-[20px] flex flex-col justify-center items-center">
-                            {/* Title and Pagination */}
                             <div className='w-full flex items-center justify-center mb-4 gap-5'>
                                 <h2 className="font-avenir font-normal text-[16px] text-[#21527D]">
                                     Uploaded Files
@@ -660,7 +640,6 @@ const UploadPage = () => {
                                 ref={previewRef}
                                 className="relative w-full h-[400px] lg:h-[310px] rounded-[25px] bg-[#FDFDFD] shadow-[0px_-2px_4px_0px_#21527D1A] p-4 overflow-hidden scrollbar-hide"
                             >
-                                {/* Display preview content */}
                                 {isTextDeleted ? (
                                     <div className="flex items-center justify-center h-full text-gray-400 italic">
                                         Text has been temporarily deleted
@@ -669,7 +648,6 @@ const UploadPage = () => {
                                     renderPreviewContent()
                                 )}
 
-                                {/* Crop Overlay - simplified */}
                                 {isCropping && !isTextDeleted && currentPreviewFile && currentPreviewFile.file.type.startsWith('image/') && (
                                     <div
                                         className="absolute border-2 border-blue-500 border-dashed z-20 cursor-move"
@@ -681,23 +659,10 @@ const UploadPage = () => {
                                         }}
                                         onMouseDown={(e) => handleMouseDown(e, 'move')}
                                     >
-                                        {/* Resize handles */}
-                                        <div
-                                            className="absolute w-3 h-3 bg-blue-500 -left-1.5 -top-1.5 cursor-nw-resize"
-                                            onMouseDown={(e) => handleMouseDown(e, 'nw')}
-                                        />
-                                        <div
-                                            className="absolute w-3 h-3 bg-blue-500 -right-1.5 -top-1.5 cursor-ne-resize"
-                                            onMouseDown={(e) => handleMouseDown(e, 'ne')}
-                                        />
-                                        <div
-                                            className="absolute w-3 h-3 bg-blue-500 -left-1.5 -bottom-1.5 cursor-sw-resize"
-                                            onMouseDown={(e) => handleMouseDown(e, 'sw')}
-                                        />
-                                        <div
-                                            className="absolute w-3 h-3 bg-blue-500 -right-1.5 -bottom-1.5 cursor-se-resize"
-                                            onMouseDown={(e) => handleMouseDown(e, 'se')}
-                                        />
+                                        <div className="absolute w-3 h-3 bg-blue-500 -left-1.5 -top-1.5 cursor-nw-resize" onMouseDown={(e) => handleMouseDown(e, 'nw')} />
+                                        <div className="absolute w-3 h-3 bg-blue-500 -right-1.5 -top-1.5 cursor-ne-resize" onMouseDown={(e) => handleMouseDown(e, 'ne')} />
+                                        <div className="absolute w-3 h-3 bg-blue-500 -left-1.5 -bottom-1.5 cursor-sw-resize" onMouseDown={(e) => handleMouseDown(e, 'sw')} />
+                                        <div className="absolute w-3 h-3 bg-blue-500 -right-1.5 -bottom-1.5 cursor-se-resize" onMouseDown={(e) => handleMouseDown(e, 'se')} />
                                     </div>
                                 )}
                             </div>
@@ -705,39 +670,33 @@ const UploadPage = () => {
 
                         {/* Control Bar */}
                         <div className="gap-y-3 flex flex-wrap md:flex-nowrap items-center justify-center w-full px-4 py-3 bg-[#E7EDF2] rounded-[15px] md:gap-3">
-                            {/* Left Zoom Controls */}
                             <div className="flex items-center gap-2 sm:gap-3 pr-4 border-r border-[#21527D]/20">
-                                {/* Zoom Out Button - hidden at 20% */}
                                 <button
                                     onClick={handleZoomOut}
                                     disabled={!currentPreviewFile}
-                                    className={`hover:opacity-80 ${zoomLevel <= 20 ? 'invisible' : ''} ${!currentPreviewFile ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    className={`hover:opacity-80 ${zoomLevel <= 20 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} ${!currentPreviewFile ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                     <SearchMinusIcon />
                                 </button>
-
                                 <div className="w-[70px] h-[30px] flex items-center justify-center rounded-[8px] bg-[#FFFFFF] text-[#21527D] font-avenir font-black text-[14px] leading-[100%] opacity-[0.70]">
                                     {zoomLevel}%
                                 </div>
-
-                                {/* Zoom In Button - hidden at 200% */}
                                 <button
                                     onClick={handleZoomIn}
                                     disabled={!currentPreviewFile}
-                                    className={`hover:opacity-80 ${zoomLevel >= 200 ? 'invisible' : ''} ${!currentPreviewFile ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    className={`hover:opacity-80 ${zoomLevel >= 200 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} ${!currentPreviewFile ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                     <SearchAddIcon />
                                 </button>
                             </div>
 
-                            {/* Pagination Section - Updated to show total pages */}
                             <div className="flex items-center gap-1 xm:gap-2 px-4 border-r border-[#21527D]/20">
                                 <button 
                                     onClick={() => setCurrentPreviewIndex(prev => Math.max(0, prev - 1))}
                                     disabled={currentPreviewIndex === 0 || uploadedFiles.length === 0}
-                                    className={currentPreviewIndex === 0 || uploadedFiles.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}
+                                    className={currentPreviewIndex === 0 || uploadedFiles.length === 0 ? 'opacity-50 cursor-not-allowed' : ' cursor-pointer'}
                                 >
-                                    <LeftPaginationArrowIcon color="#21527D" />
+                                    <LeftPaginationArrowIcon color="#000000" />
                                 </button>
                                 <div className="w-[22px] h-[22px] flex items-center justify-center rounded-[8px] bg-[#FFFFFF] text-[#21527D] font-avenir font-black text-[14px] leading-[100%] opacity-[0.70]">
                                     {uploadedFiles.length > 0 ? currentPreviewIndex + 1 : 0}
@@ -749,13 +708,12 @@ const UploadPage = () => {
                                 <button 
                                     onClick={() => setCurrentPreviewIndex(prev => Math.min(uploadedFiles.length - 1, prev + 1))}
                                     disabled={currentPreviewIndex >= uploadedFiles.length - 1 || uploadedFiles.length === 0}
-                                    className={currentPreviewIndex >= uploadedFiles.length - 1 || uploadedFiles.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}
+                                    className={currentPreviewIndex >= uploadedFiles.length - 1 || uploadedFiles.length === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                                 >
-                                    <RightArrowIcon />
+                                    <RightArrowIcon  />
                                 </button>
                             </div>
 
-                            {/* Right Action Buttons */}
                             <div className="flex items-center gap-10 pl-4">
                                 <button
                                     onClick={handleCropStart}
@@ -784,14 +742,30 @@ const UploadPage = () => {
                         {/* Action Buttons */}
                         <div className="flex flex-col sm:flex-row items-center gap-4 mt-2 justify-center">
                             <button
-                                onClick={() => currentPreviewFile && setShowChooseFormatPopup(true)}
+                                onClick={() => {
+                                    if (!currentPreviewFile) return;
+                                    
+                                    if (ocrType === 'invoice') {
+                                        setShowExtractingPopup(true);
+                                    } else {
+                                        setShowChooseFormatPopup(true);
+                                    }
+                                }}
                                 disabled={!currentPreviewFile}
                                 className={`font-avenir font-semibold lg:font-bold text-[16px] leading-[100%] text-[#21527D] bg-[#E7EDF2] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-[260px] h-[55px] rounded-[15px] flex items-center justify-center cursor-pointer ${!currentPreviewFile ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
                             >
                                 Extract This File
                             </button>
                             <button
-                                onClick={() => uploadedFiles.length > 0 && setShowChooseFormatPopup(true)}
+                                onClick={() => {
+                                    if (uploadedFiles.length === 0) return;
+                                    
+                                    if (ocrType === 'invoice') {
+                                        setShowExtractingPopup(true);
+                                    } else {
+                                        setShowChooseFormatPopup(true);
+                                    }
+                                }}
                                 disabled={uploadedFiles.length === 0}
                                 className={`font-avenir font-semibold lg:font-bold text-[16px] leading-[100%] text-[#FDFDFD] bg-[#21527D] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-[250px] h-[55px] rounded-[15px] flex items-center justify-center cursor-pointer ${uploadedFiles.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
                             >
@@ -801,6 +775,7 @@ const UploadPage = () => {
                     </div>
                 </div>
 
+                {/* Popups */}
                 {showChooseFormatPopup && (
                     <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
                         <ChooseAFormatPopup
@@ -814,7 +789,11 @@ const UploadPage = () => {
                 )}
                 {showExtractingPopup && (
                     <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
-                        <ExtractingFilesPopup closePopup={() => setShowExtractingPopup(false)} />
+                        <ExtractingFilesPopup 
+                            closePopup={() => setShowExtractingPopup(false)}
+                            uploadedFiles={uploadedFiles}
+                            currentPreviewIndex={currentPreviewIndex}
+                        />
                     </div>
                 )}
 
