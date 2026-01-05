@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import EditIcon from "../../assets/icons/accountpage/EditIcon";
 import Navbar from "../landingpages/Navbar";
 import DeleteAccount from "../ocrpopups/DeleteAccount";
+import api from "../../api/axios";
 
 const Account = () => {
     const [fullName, setFullName] = useState("");
@@ -9,7 +10,7 @@ const Account = () => {
     const [mobile, setMobile] = useState("");
     const [error, setError] = useState("");
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    
+
     // Add states for edit mode
     const [isEditingName, setIsEditingName] = useState(false);
     const [isEditingMobile, setIsEditingMobile] = useState(false);
@@ -84,6 +85,62 @@ const Account = () => {
         };
     }, [showDeleteModal]);
 
+    useEffect(() => {
+        const userId = localStorage.getItem("userId");
+        if (!userId) return;
+
+        api.get(`/auth/profile/${userId}`)
+            .then(res => {
+                setFullName(res.data.full_name || "");
+                setEmail(res.data.email || "");
+                setMobile(res.data.phone || "");
+            })
+            .catch(() => {
+                setError("Failed to load profile");
+            });
+    }, []);
+
+
+    const handleUpdateName = async () => {
+        const userId = localStorage.getItem("userId");
+
+        await api.put(`/auth/profile/${userId}`, {
+            fullName,
+            phone: mobile || null
+        });
+
+        setIsEditingName(false);
+    };
+
+    const handleUpdateMobile = async () => {
+        const userId = localStorage.getItem("userId");
+
+        await api.put(`/auth/profile/${userId}`, {
+            fullName,
+            phone: mobile
+        });
+
+        setIsEditingMobile(false);
+    };
+
+    const handleDeleteAccount = async () => {
+        const userId = localStorage.getItem("userId");
+
+        await api.delete(`/auth/profile/${userId}`);
+
+        localStorage.clear();
+        navigate("/signin");
+    };
+
+    const handleUpdateEmail = async () => {
+        const userId = localStorage.getItem("userId");
+
+        await api.put(`/auth/profile/${userId}`, {
+            fullName,
+            email: email || null,
+            phone: mobile || null,
+        });
+    };
     return (
         <div>
             <Navbar />
@@ -113,7 +170,7 @@ const Account = () => {
                                         className={getInputStyles()}
                                     />
                                 </div>
-                                <button
+                                <button onClick={handleUpdateName}
                                     className="cursor-pointer font-avenir font-bold text-base sm:text-[15px] lg:text-[16px] leading-[26px] text-[#FFFFFF] bg-[#21527D] w-full sm:w-auto sm:min-w-[160px] h-[40px] rounded-[10px]"
                                 >
                                     Change Name
@@ -202,7 +259,7 @@ const Account = () => {
                                         className={getInputStyles()}
                                     />
                                 </div>
-                                <button
+                                <button onClick={handleUpdateMobile}
                                     className="cursor-pointer font-avenir font-bold text-base sm:text-[15px] lg:text-[16px] leading-[26px] text-[#FFFFFF] bg-[#21527D] w-full sm:w-auto sm:min-w-[160px] h-[40px] rounded-[10px]"
                                 >
                                     Change  number

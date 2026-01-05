@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import icon from "../../assets/images/icon.webp";
 import DownArrowIconForm from "../../assets/icons/DownArrowIconForm";
+import api from "../../api/axios";
 
 const BusinessUser = () => {
     const [organizationName, setOrganizationName] = useState("");
@@ -64,33 +65,56 @@ const BusinessUser = () => {
     };
 
     const handleContinue = () => {
-        // Clear all errors
         setNameError("");
         setIndustryError("");
         setSizeError("");
-        
-        // Step 1: Validate organization name first
+
         const nameValidationError = validateOrganizationName(organizationName);
         if (nameValidationError) {
             setNameError(nameValidationError);
-            return; // Stop here if organization name has error
+            return;
         }
-        
-        // Step 2: If organization name is valid, validate industry
+
         const industryValidationError = validateIndustry();
         if (industryValidationError) {
             setIndustryError(industryValidationError);
-            return; // Stop here if industry has error
+            return;
         }
-        
-        // Step 3: If both above are valid, validate organization size
+
         const sizeValidationError = validateOrganizationSize();
         if (sizeValidationError) {
             setSizeError(sizeValidationError);
-            return; // Stop here if size has error
+            return;
         }
-        
-        // If all are valid, proceed
+
+        // 🔥 READ existing signup data
+        const existingData =
+            JSON.parse(localStorage.getItem("signupData")) || {};
+
+        // 🔥 UPDATE business details
+        const updatedData = {
+            ...existingData,
+            organizationName,
+            industry: selectedIndustry,
+            organizationSize: selectedSize,
+        };
+
+        // 🔥 SAVE back to localStorage
+        localStorage.setItem("signupData", JSON.stringify(updatedData));
+
+        console.log("🟡 Step 4 saved:", updatedData);
+
+        navigate("/allusers");
+    };
+
+    const handleSkip = () => {
+        const data = {
+            organizationName: null,
+            industry: null,
+            organizationSize: null,
+        };
+
+        localStorage.setItem("businessUser", JSON.stringify(data));
         navigate("/allusers");
     };
 
@@ -176,7 +200,7 @@ const BusinessUser = () => {
     };
 
     return (
-    <div className="h-full md:min-h-screen flex items-center justify-center py-1 md:py-0 bg-[#FAFDFF]">
+        <div className="h-full md:min-h-screen flex items-center justify-center py-1 md:py-0 bg-[#FAFDFF]">
             <div className="w-full max-w-[500px] bg-white shadow-[0px_0px_7px_0px_#00000040] md:rounded-[20px] px-10 py-8 flex flex-col gap-5">
 
                 {/* Logo */}
@@ -411,9 +435,9 @@ const BusinessUser = () => {
                         Continue
                     </button>
 
-                    <div 
-                    onClick={()=>navigate("/allusers")}
-                    className="font-avenir font-bold text-[16px] leading-[26px] tracking-[0%] text-[#21527D] text-center cursor-pointer hover:underline">
+                    <div
+                        onClick={handleSkip}
+                        className="font-avenir font-bold text-[16px] leading-[26px] tracking-[0%] text-[#21527D] text-center cursor-pointer hover:underline">
                         Skip
                     </div>
                 </div>

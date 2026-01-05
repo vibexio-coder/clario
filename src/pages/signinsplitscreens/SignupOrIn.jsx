@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import icon from "../../assets/images/icon.webp";
 import GoogleIcon from "../../assets/icons/loginpages/GoogleIcon";
 import MailIcon from "../../assets/icons/loginpages/MailIcon";
+import api from "../../api/axios";
 
 const SignupOrIn = () => {
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    
 
     const validateEmail = (email) => {
         const trimmedEmail = email.trim();
@@ -31,7 +33,7 @@ const SignupOrIn = () => {
         return "";
     };
 
-    const handleContinue = () => {
+    const handleContinue = async () => {
         const validationError = validateEmail(email);
 
         if (validationError) {
@@ -39,11 +41,22 @@ const SignupOrIn = () => {
             return;
         }
 
-        // Clear any previous error
         setError("");
 
-        // Route to /password page
-        navigate("/password");
+        try {
+            const res = await api.post("/auth/check-user", { email });
+
+            if (res.data.exists) {
+                // ✅ User exists → login flow
+                localStorage.setItem("loginEmail", email);
+                navigate("/password");
+            } else {
+                // 🆕 New user → signup flow
+                navigate("/fullname");
+            }
+        } catch (err) {
+            setError("Something went wrong. Try again.");
+        }
     };
 
     const handleInputChange = (e) => {

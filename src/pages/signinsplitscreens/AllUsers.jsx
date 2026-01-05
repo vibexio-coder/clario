@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import icon from "../../assets/images/icon.webp";
 import DownArrowIconForm from "../../assets/icons/DownArrowIconForm";
+import api from "../../api/axios";
 
 const AllUsers = () => {
     const [selectedUseCase, setSelectedUseCase] = useState("");
@@ -29,20 +30,64 @@ const AllUsers = () => {
     };
 
 
-    const handleFinishSetup = () => {
+    const handleFinishSetup = async () => {
         const validationError = validateUseCase();
-
         if (validationError) {
             setError(validationError);
             return;
         }
 
-        // Clear any previous error
         setError("");
 
-        // Route to next page (update with your actual route)
-        navigate("/landingpage");
+        const finalUseCase =
+            selectedUseCase === "Other" ? otherUseCase : selectedUseCase;
+
+        // 🔥 READ ALL PREVIOUS STEPS DATA
+        const existingData =
+            JSON.parse(localStorage.getItem("signupData")) || {};
+
+        if (!existingData.email && !existingData.phone) {
+            setError("Signup data missing. Please restart signup.");
+            return;
+        }
+
+        // 🔥 FINAL PAYLOAD (MATCH BACKEND)
+        const finalPayload = {
+            fullName: existingData.full_name || existingData.fullName,
+            email: existingData.email || null,
+            phone: existingData.phone || null,
+            password: existingData.password,
+            accountType: existingData.accountType,
+            organizationName: existingData.organizationName || null,
+            industry: existingData.industry || null,
+            organizationSize: existingData.organizationSize || null,
+            primaryUseCase: finalUseCase,
+        };
+
+
+        console.log("🔥 FINAL SIGNUP PAYLOAD:", finalPayload);
+
+        try {
+            // ✅ ONE AND ONLY API CALL
+            const res = await api.post("/auth/signup", finalPayload);
+
+            console.log("✅ SIGNUP SUCCESS:", res.data);
+
+            localStorage.setItem("userId", res.data.userId);
+            // 🧹 CLEANUP
+            localStorage.removeItem("signupData");
+
+            navigate("/landingpage"); // or signin page
+        } catch (err) {
+            console.error("❌ FINAL SIGNUP ERROR:", err.response || err);
+            setError(
+                err.response?.data?.message ||
+                "Something went wrong. Please try again."
+            );
+        }
     };
+
+
 
     const handleKeyPress = (e) => {
         if (e.key === "Enter") {

@@ -12,66 +12,77 @@ const CreatePassword = () => {
 
     const validatePassword = (password) => {
         const trimmedPassword = password.trim();
-        
+
         // Check if empty
         if (!trimmedPassword) {
             return "Password is required";
         }
-        
+
         // Check minimum length
         if (trimmedPassword.length < 8) {
             return "Password must be at least 8 characters long";
         }
-        
+
         // Check for uppercase letters
         if (!/[A-Z]/.test(trimmedPassword)) {
             return "Password must contain at least one uppercase letter";
         }
-        
+
         // Check for lowercase letters
         if (!/[a-z]/.test(trimmedPassword)) {
             return "Password must contain at least one lowercase letter";
         }
-        
+
         // Check for numbers
         if (!/[0-9]/.test(trimmedPassword)) {
             return "Password must contain at least one number";
         }
-        
+
         // Check for special characters
         if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(trimmedPassword)) {
             return "Password must contain at least one special character";
         }
-        
+
         return "";
     };
 
     const handleCreateAccount = () => {
-        // Validate password
         const validationError = validatePassword(password);
-        
+
         if (validationError) {
             setError(validationError);
             return;
         }
-        
-        // Check if terms are accepted
+
         if (!isChecked) {
             setError("You must agree to the Terms of Service and Privacy Policy");
             return;
         }
-        
-        // Clear any previous error
+
         setError("");
-        
-        // Route to next page
+
+        // 🔥 ADD PASSWORD TO signupData (NO DB)
+        const data = JSON.parse(localStorage.getItem("signupData"));
+
+        if (!data) {
+            setError("Signup data missing. Please start again.");
+            return;
+        }
+
+        data.password = password;
+
+        localStorage.setItem("signupData", JSON.stringify(data));
+
+        console.log("🟡 STEP 2 (password added):", data);
+
         navigate("/businessdetected");
     };
+
 
     const handleInputChange = (e) => {
         const value = e.target.value;
         setPassword(value);
-        
+
         // Clear error when user starts typing
         if (error) {
             setError("");
@@ -98,16 +109,16 @@ const CreatePassword = () => {
 
     const getInputStyles = () => {
         const baseStyles = "w-full bg-[#F2F2F2] border rounded-[6px] px-4 py-3 font-avenir text-[16px] leading-[26px] outline-none focus:ring-1 pr-12";
-        
+
         if (error && !error.includes("agree")) {
             return `${baseStyles} border-[#F1511B] placeholder:text-[#F1511B] text-[#F1511B] focus:ring-[#F1511B] bg-[#FFFFFF]`;
         }
-        
+
         return `${baseStyles} border-[#21527D] placeholder:text-[#21527D]/50 text-[#21527D] focus:ring-[#21527D]`;
     };
 
     return (
-    <div className="h-full md:min-h-screen flex items-center justify-center py-1 md:py-0 bg-[#FAFDFF]">
+        <div className="h-full md:min-h-screen flex items-center justify-center py-1 md:py-0 bg-[#FAFDFF]">
             <div className="w-full max-w-[500px] bg-white shadow-[0px_0px_7px_0px_#00000040] md:rounded-[20px] px-10 py-8 flex flex-col gap-5">
 
                 {/* Logo */}
@@ -146,7 +157,7 @@ const CreatePassword = () => {
                     </div>
 
                     <p className="font-avenir font-normal text-[10px] leading-[26px] tracking-[0%] text-[#21527D]">
-                       Use at least 8 characters, including uppercase, lowercase , numbers and special characters.
+                        Use at least 8 characters, including uppercase, lowercase , numbers and special characters.
                     </p>
 
                     {/* Error Message for password */}
@@ -161,8 +172,8 @@ const CreatePassword = () => {
 
                 {/* Terms and Conditions */}
                 <div className="flex items-center">
-                    <input 
-                        type='checkbox' 
+                    <input
+                        type='checkbox'
                         className="mr-2 mt-1 cursor-pointer"
                         checked={isChecked}
                         onChange={handleCheckboxChange}
@@ -182,7 +193,7 @@ const CreatePassword = () => {
                 )}
 
                 {/* Create Account Button */}
-                <button 
+                <button
                     onClick={handleCreateAccount}
                     className="w-full font-avenir font-bold text-[16px] leading-[26px] text-white bg-[#21527D] rounded-[10px] py-3 cursor-pointer"
                 >

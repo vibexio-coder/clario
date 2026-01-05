@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import icon from "../../assets/images/icon.webp";
 import EyeIcon from "../../assets/icons/loginpages/EyeIcon";
+import api from "../../api/axios";
 
 const Password = () => {
     const [password, setPassword] = useState("");
@@ -9,28 +10,35 @@ const Password = () => {
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
+    const email = localStorage.getItem("loginEmail");
+
+
     // Temporary correct password
     const correctPassword = "Clario123";
 
-    const handleSignIn = () => {
-        // Check if empty
-        if (!password.trim()) {
+    const handleLogin = async () => {
+        if (!password || !password.trim()) {
             setError("Password is required");
             return;
         }
 
-        // Check if password matches the temporary password
-        if (password !== correctPassword) {
-            setError("Incorrect password. Please try again.");
-            return;
+        try {
+            const res = await api.post("/auth/login", {
+                email,
+                password,
+            });
+
+            // 🔥 NOW res EXISTS
+            localStorage.setItem("userId", res.data.userId);
+            console.log("Login response:", res.data.userId);
+
+            localStorage.removeItem("loginEmail");
+            navigate("/landingpage");
+        } catch (err) {
+            setError("Invalid email or password");
         }
-
-        // Clear any previous error
-        setError("");
-
-        // Route to next page
-        navigate("/landingpage");
     };
+
 
     const handleInputChange = (e) => {
         const value = e.target.value;
@@ -44,7 +52,7 @@ const Password = () => {
 
     const handleKeyPress = (e) => {
         if (e.key === "Enter") {
-            handleSignIn();
+            handleLogin();
         }
     };
 
@@ -63,7 +71,7 @@ const Password = () => {
     };
 
     return (
-    <div className="h-full md:min-h-screen flex items-center justify-center py-1 md:py-0 bg-[#FAFDFF]">
+        <div className="h-full md:min-h-screen flex items-center justify-center py-1 md:py-0 bg-[#FAFDFF]">
             <div className="w-full max-w-[500px] bg-white shadow-[0px_0px_7px_0px_#00000040] md:rounded-[20px] px-10 py-8 flex flex-col gap-5">
 
                 {/* Logo */}
@@ -114,7 +122,7 @@ const Password = () => {
 
                 {/* Continue Button */}
                 <button
-                    onClick={handleSignIn}
+                    onClick={handleLogin}
                     className="w-full font-avenir font-bold text-[16px] leading-[26px] text-white bg-[#21527D] rounded-[10px] py-3 cursor-pointer"
                 >
                     Sign in

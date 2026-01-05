@@ -1,7 +1,34 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../api/axios";
 import CloseIcon from "../../assets/icons/loginpages/CloseIcon";
 
 const DeleteAccount = ({ onClose }) => {
+  const navigate = useNavigate();
+
+  const handleDelete = async () => {
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) {
+      alert("User not logged in");
+      return;
+    }
+
+    try {
+      await api.delete(`/auth/profile/${userId}`);
+
+      // cleanup
+      localStorage.clear();
+
+      onClose();
+
+      navigate("/"); // or /login
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete account");
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/30 px-4">
       {/* Card */}
@@ -15,13 +42,13 @@ const DeleteAccount = ({ onClose }) => {
         {/* Close */}
         <button
           onClick={onClose}
-          className="absolute right-4 sm:right-6 top-4 sm:top-6 cursor-pointer">
+          className="absolute right-4 sm:right-6 top-4 sm:top-6 cursor-pointer"
+        >
           <CloseIcon />
         </button>
 
         {/* Title */}
-        <h2
-          className="font-avenir font-semibold lg:font-bold text-[18px] sm:text-[20px] lg:text-[22px]
+        <h2 className="font-avenir font-semibold lg:font-bold text-[18px] sm:text-[20px] lg:text-[22px]
           leading-7 sm:leading-[34px] lg:leading-[43px]
           text-center text-[#121212]
           mb-8 px-2"
@@ -33,18 +60,20 @@ const DeleteAccount = ({ onClose }) => {
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <button
-            className="font-avenir font-semibold lg:font-bold text-[16px] leading-[100%]
+            onClick={onClose}
+            className="font-avenir font-semibold lg:font-bold text-[16px]
             text-[#21527D] bg-[#FDFDFD]
             border border-[#21527D]
-            w-full sm:w-[220px] h-[40px] rounded-[10px] cursor-pointer"
+            w-full sm:w-[220px] h-[40px] rounded-[10px]"
           >
             Cancel
           </button>
 
           <button
-            className="font-avenir font-semibold lg:font-bold text-[16px] leading-[100%]
+            onClick={handleDelete}
+            className="font-avenir font-semibold lg:font-bold text-[16px]
             text-[#FDFDFD] bg-[#21527D]
-            w-full sm:w-[220px] h-[40px] rounded-[10px] cursor-pointer"
+            w-full sm:w-[220px] h-[40px] rounded-[10px]"
           >
             Yes, Delete my Account
           </button>
