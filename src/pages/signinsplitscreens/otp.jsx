@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import icon from "../../assets/images/icon.webp";
+import api from "../../api/axios";
 
 const Otp = () => {
     const [otp, setOtp] = useState("");
@@ -22,25 +23,28 @@ const Otp = () => {
         }
     };
 
-    const handleVerify = () => {
-        // Check if all fields are filled
+    const handleVerify = async () => {
         if (otp.length !== 6) {
             setError("Please enter the complete 6-digit code");
             return;
         }
-        
-        // Check if OTP matches
-        if (otp !== correctOtp) {
+
+        try {
+            const email = localStorage.getItem("loginValue");
+
+            await api.post("/auth/verify-otp", {
+                email,
+                otp,
+            });
+
+            setError("");
+            localStorage.setItem("resetEmail", email);
+            navigate("/newpassword"); // 👈 direct route
+        } catch (err) {
             setError("Invalid verification code. Please try again.");
-            return;
         }
-        
-        // Clear error
-        setError("");
-        
-        // Route to landing page
-        navigate("/landingpage");
     };
+
 
     const handleKeyPress = (e) => {
         if (e.key === "Enter") {
@@ -50,16 +54,16 @@ const Otp = () => {
 
     const getInputStyles = () => {
         const baseStyles = "w-full bg-[#F2F2F2] border rounded-[6px] px-4 py-3 font-avenir text-[16px] leading-[26px] outline-none focus:ring-1";
-        
+
         if (error) {
             return `${baseStyles} border-[#F1511B] placeholder:text-[#F1511B] text-[#F1511B] focus:ring-[#F1511B] bg-[#FFFFFF]`;
         }
-        
+
         return `${baseStyles} border-[#21527D] placeholder:text-[#21527D]/50 text-[#21527D] focus:ring-[#21527D]`;
     };
 
     return (
-    <div className="h-full md:min-h-screen flex items-center justify-center py-1 md:py-0 bg-[#FAFDFF]">
+        <div className="h-full md:min-h-screen flex items-center justify-center py-1 md:py-0 bg-[#FAFDFF]">
             <div className="w-full max-w-[500px] bg-white shadow-[0px_0px_7px_0px_#00000040] md:rounded-[20px] px-10 py-8 flex flex-col gap-5">
 
                 {/* Logo */}
@@ -104,7 +108,7 @@ const Otp = () => {
                 </div>
 
                 {/* Continue Button */}
-                <button 
+                <button
                     onClick={handleVerify}
                     className="w-full font-avenir font-bold text-[16px] leading-[26px] text-white bg-[#21527D] rounded-[10px] py-3 cursor-pointer"
                 >

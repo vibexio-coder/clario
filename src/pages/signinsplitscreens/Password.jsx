@@ -23,28 +23,29 @@ const Password = () => {
             return;
         }
 
+        if (!loginType || !loginValue) {
+            navigate("/");
+            return;
+        }
+
         try {
             const payload =
                 loginType === "email"
-                    ? { email: loginValue, password }
+                    ? { email: loginValue.toLowerCase(), password }
                     : { phone: loginValue, password };
 
             const res = await api.post("/auth/login", payload);
 
-
-            // 🔥 NOW res EXISTS
             localStorage.setItem("userId", res.data.userId);
-            console.log("Login response:", res.data.userId);
 
             localStorage.removeItem("loginType");
             localStorage.removeItem("loginValue");
 
             navigate("/landingpage");
         } catch (err) {
-            setError("Invalid email or password");
+            setError("Invalid email/phone or password");
         }
     };
-
 
     const handleInputChange = (e) => {
         const value = e.target.value;
@@ -61,6 +62,22 @@ const Password = () => {
             handleLogin();
         }
     };
+
+    const handleForgotPassword = async () => {
+        try {
+            const payload =
+                loginType === "email"
+                    ? { email: loginValue }
+                    : { phone: loginValue };
+
+            await api.post("/auth/forgot-password", payload);
+
+            navigate("/otp", { state: { from: "forgot-password" } });
+        } catch (err) {
+            setError("Failed to send OTP. Please try again.");
+        }
+    };
+
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -135,7 +152,7 @@ const Password = () => {
                 </button>
 
                 <div
-                    onClick={() => navigate("/otp")}
+                    onClick={handleForgotPassword}
                     className="font-avenir font-bold text-[16px] leading-[26px] tracking-[0%] text-[#21527D] text-center cursor-pointer">
                     Forgot password ?
                 </div>

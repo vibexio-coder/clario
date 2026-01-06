@@ -32,6 +32,7 @@ import Account from './pages/accountpages/Account';
 import Security from './pages/accountpages/Security';
 import Subscription from './pages/accountpages/Subscription';
 import BillingInvoices from './pages/accountpages/BillingInvoices';
+import NewPassword from './pages/signinsplitscreens/NewPassword';
 
 const App = () => {
   return (
@@ -55,6 +56,7 @@ const App = () => {
         <Route path="/invoicedoc" element={<InvoiceDoc />} />
         <Route path="/password" element={<Password />} />
         <Route path="/otp" element={<Otp />} />
+        <Route path="/newpassword" element={<NewPassword />} />
         <Route path="/fullname" element={<FullName />} />
         <Route path="/createpassword" element={<CreatePassword />} />
         <Route path="/businessdetected" element={<BusinessDetected />} />

@@ -154,7 +154,7 @@ const Navbar = () => {
 
                     {/* Logo */}
                     <div className="flex-shrink-0">
-                        <Link to="/" onClick={closeMobileMenu}>
+                        <Link to="/landingpage" onClick={closeMobileMenu}>
                             <img src={icon} alt="Clario" className="h-10 w-auto lg:h-12" />
                         </Link>
                     </div>

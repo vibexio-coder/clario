@@ -22,7 +22,7 @@ const NAV_ITEMS = {
     { label: "Custom AI Workflows", to: "/solutions/custom-ai" },
   ],
   Company: [
-    { label: "About Vibexio", to: "/about" },
+    { label: "About Vibexio", to: "https://www.vibexio.ai/" },
     { label: "Careers", to: "/careers" },
     { label: "Contact", to: "/contact" },
     { label: "Privacy Policy", to: "/privacy-policy" },
