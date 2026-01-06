@@ -10,7 +10,8 @@ const Password = () => {
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
-    const email = localStorage.getItem("loginEmail");
+    const loginType = localStorage.getItem("loginType"); // "email" or "phone"
+    const loginValue = localStorage.getItem("loginValue");
 
 
     // Temporary correct password
@@ -23,16 +24,21 @@ const Password = () => {
         }
 
         try {
-            const res = await api.post("/auth/login", {
-                email,
-                password,
-            });
+            const payload =
+                loginType === "email"
+                    ? { email: loginValue, password }
+                    : { phone: loginValue, password };
+
+            const res = await api.post("/auth/login", payload);
+
 
             // 🔥 NOW res EXISTS
             localStorage.setItem("userId", res.data.userId);
             console.log("Login response:", res.data.userId);
 
-            localStorage.removeItem("loginEmail");
+            localStorage.removeItem("loginType");
+            localStorage.removeItem("loginValue");
+
             navigate("/landingpage");
         } catch (err) {
             setError("Invalid email or password");

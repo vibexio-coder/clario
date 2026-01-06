@@ -37,23 +37,29 @@ const AllUsers = () => {
             return;
         }
 
-        setError("");
-
-        const finalUseCase =
-            selectedUseCase === "Other" ? otherUseCase : selectedUseCase;
-
-        // 🔥 READ ALL PREVIOUS STEPS DATA
         const existingData =
             JSON.parse(localStorage.getItem("signupData")) || {};
 
-        if (!existingData.email && !existingData.phone) {
+        const fullName =
+            existingData.fullName ||
+            existingData.full_name ||
+            "";
+
+        if (!fullName.trim()) {
+            setError("Full name missing. Please restart signup.");
+            return;
+        }
+
+        if (
+            (!existingData.email || !existingData.email.trim()) &&
+            (!existingData.phone || !existingData.phone.trim())
+        ) {
             setError("Signup data missing. Please restart signup.");
             return;
         }
 
-        // 🔥 FINAL PAYLOAD (MATCH BACKEND)
         const finalPayload = {
-            fullName: existingData.full_name || existingData.fullName,
+            fullName,
             email: existingData.email || null,
             phone: existingData.phone || null,
             password: existingData.password,
@@ -61,25 +67,18 @@ const AllUsers = () => {
             organizationName: existingData.organizationName || null,
             industry: existingData.industry || null,
             organizationSize: existingData.organizationSize || null,
-            primaryUseCase: finalUseCase,
+            primaryUseCase:
+                selectedUseCase === "Other" ? otherUseCase : selectedUseCase,
         };
 
-
-        console.log("🔥 FINAL SIGNUP PAYLOAD:", finalPayload);
-
         try {
-            // ✅ ONE AND ONLY API CALL
             const res = await api.post("/auth/signup", finalPayload);
 
-            console.log("✅ SIGNUP SUCCESS:", res.data);
-
             localStorage.setItem("userId", res.data.userId);
-            // 🧹 CLEANUP
             localStorage.removeItem("signupData");
 
-            navigate("/landingpage"); // or signin page
+            navigate("/account");
         } catch (err) {
-            console.error("❌ FINAL SIGNUP ERROR:", err.response || err);
             setError(
                 err.response?.data?.message ||
                 "Something went wrong. Please try again."

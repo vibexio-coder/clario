@@ -9,7 +9,9 @@ const SignupOrIn = () => {
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
-    
+    const [value, setValue] = useState("");
+
+
 
     const validateEmail = (email) => {
         const trimmedEmail = email.trim();
@@ -33,9 +35,36 @@ const SignupOrIn = () => {
         return "";
     };
 
-    const handleContinue = async () => {
-        const validationError = validateEmail(email);
+    const detectType = (input) => {
+        if (/^\d+$/.test(input)) return "phone";
+        if (input.includes("@")) return "email";
+        return "unknown";
+    };
 
+    const validateInput = (input) => {
+        const trimmed = input.trim();
+        if (!trimmed) return "Email or phone number is required";
+
+        const type = detectType(trimmed);
+
+        if (type === "email") {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(trimmed)) {
+                return "Please enter a valid email address";
+            }
+        }
+
+        if (type === "phone") {
+            if (trimmed.length !== 10) {
+                return "Phone number must be 10 digits";
+            }
+        }
+
+        return "";
+    };
+
+    const handleContinue = async () => {
+        const validationError = validateInput(value);
         if (validationError) {
             setError(validationError);
             return;
@@ -43,21 +72,26 @@ const SignupOrIn = () => {
 
         setError("");
 
+        const type = detectType(value);
+        const payload = type === "email" ? { email: value } : { phone: value };
+
+        localStorage.setItem("loginType", type);
+        localStorage.setItem("loginValue", value.trim());
+
         try {
-            const res = await api.post("/auth/check-user", { email });
+            const res = await api.post("/auth/check-user", payload);
 
             if (res.data.exists) {
-                // ✅ User exists → login flow
-                localStorage.setItem("loginEmail", email);
+                localStorage.setItem("loginValue", value);
                 navigate("/password");
             } else {
-                // 🆕 New user → signup flow
                 navigate("/fullname");
             }
         } catch (err) {
             setError("Something went wrong. Try again.");
         }
     };
+
 
     const handleInputChange = (e) => {
         const value = e.target.value;
@@ -105,9 +139,12 @@ const SignupOrIn = () => {
 
                 <input
                     type="text"
-                    placeholder="name@gmail.com"
-                    value={email}
-                    onChange={handleInputChange}
+                    placeholder="Email or phone number"
+                    value={value}
+                    onChange={(e) => {
+                        setValue(e.target.value);
+                        if (error) setError("");
+                    }}
                     onKeyPress={handleKeyPress}
                     className={getInputStyles()}
                 />

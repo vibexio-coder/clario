@@ -3,6 +3,7 @@ import EditIcon from "../../assets/icons/accountpage/EditIcon";
 import Navbar from "../landingpages/Navbar";
 import DeleteAccount from "../ocrpopups/DeleteAccount";
 import api from "../../api/axios";
+import { useNavigate } from "react-router-dom";
 
 const Account = () => {
     const [fullName, setFullName] = useState("");
@@ -10,6 +11,7 @@ const Account = () => {
     const [mobile, setMobile] = useState("");
     const [error, setError] = useState("");
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const navigate = useNavigate();
 
     // Add states for edit mode
     const [isEditingName, setIsEditingName] = useState(false);
@@ -87,41 +89,55 @@ const Account = () => {
 
     useEffect(() => {
         const userId = localStorage.getItem("userId");
-        if (!userId) return;
+
+        if (!userId) {
+            console.warn("❌ userId missing, redirecting to signin");
+            navigate("/signin");
+            return;
+        }
 
         api.get(`/auth/profile/${userId}`)
             .then(res => {
-                setFullName(res.data.full_name || "");
-                setEmail(res.data.email || "");
-                setMobile(res.data.phone || "");
+                setFullName(res.data.full_name ?? "None");
+                setEmail(res.data.email ?? "None");
+                setMobile(res.data.phone ?? "None");
             })
             .catch(() => {
                 setError("Failed to load profile");
             });
     }, []);
 
-
     const handleUpdateName = async () => {
         const userId = localStorage.getItem("userId");
 
+        if (!fullName.trim()) {
+            setError("Full name is required");
+            return;
+        }
+
         await api.put(`/auth/profile/${userId}`, {
             fullName,
-            phone: mobile || null
         });
 
         setIsEditingName(false);
     };
 
+
     const handleUpdateMobile = async () => {
         const userId = localStorage.getItem("userId");
 
+        if (!mobile.trim()) {
+            setError("Mobile number is required");
+            return;
+        }
+
         await api.put(`/auth/profile/${userId}`, {
-            fullName,
-            phone: mobile
+            phone: mobile,
         });
 
         setIsEditingMobile(false);
     };
+
 
     const handleDeleteAccount = async () => {
         const userId = localStorage.getItem("userId");
@@ -135,12 +151,19 @@ const Account = () => {
     const handleUpdateEmail = async () => {
         const userId = localStorage.getItem("userId");
 
+        if (!email.trim()) {
+            setError("Email is required");
+            return;
+        }
+
         await api.put(`/auth/profile/${userId}`, {
-            fullName,
-            email: email || null,
-            phone: mobile || null,
+            email,
         });
+
+        setEmail(email);
     };
+
+
     return (
         <div>
             <Navbar />
@@ -164,9 +187,8 @@ const Account = () => {
                                     <input
                                         type="text"
                                         placeholder="Enter your full name"
-                                        value={fullName}
+                                        value={fullName === "None" ? "" : fullName}
                                         onChange={handleFullNameChange}
-                                        onKeyPress={handleKeyPress}
                                         className={getInputStyles()}
                                     />
                                 </div>
@@ -215,17 +237,18 @@ const Account = () => {
                                 <input
                                     type="email"
                                     placeholder="Enter your email address"
-                                    value={email}
+                                    value={email === "None" ? "" : email}
                                     onChange={handleEmailChange}
-                                    onKeyPress={handleKeyPress}
                                     className={getInputStyles()}
                                 />
                             </div>
 
                             <button
+                                onClick={handleUpdateEmail}
                                 className="cursor-pointer font-avenir font-bold text-base sm:text-[15px] lg:text-[16px] leading-[26px] text-[#FFFFFF] bg-[#21527D] w-full sm:w-auto sm:min-w-[160px] h-[40px] rounded-[10px]"
                             >
-                                Change email
+                                {email === "None" ? "Add email" : "Change email"}
+
                             </button>
                         </div>
 
@@ -253,16 +276,15 @@ const Account = () => {
                                     <input
                                         type="tel"
                                         placeholder="Enter mobile number"
-                                        value={mobile}
+                                        value={mobile === "None" ? "" : mobile}
                                         onChange={handleMobileChange}
-                                        onKeyPress={handleKeyPress}
                                         className={getInputStyles()}
                                     />
                                 </div>
                                 <button onClick={handleUpdateMobile}
                                     className="cursor-pointer font-avenir font-bold text-base sm:text-[15px] lg:text-[16px] leading-[26px] text-[#FFFFFF] bg-[#21527D] w-full sm:w-auto sm:min-w-[160px] h-[40px] rounded-[10px]"
                                 >
-                                    Change  number
+                                    {mobile === "None" ? "Add number" : "Change number"}
                                 </button>
                             </div>
                         ) : (

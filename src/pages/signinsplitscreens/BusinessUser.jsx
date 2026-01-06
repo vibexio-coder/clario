@@ -11,6 +11,7 @@ const BusinessUser = () => {
     const [nameError, setNameError] = useState("");
     const [industryError, setIndustryError] = useState("");
     const [sizeError, setSizeError] = useState("");
+    const SKIPPED_TEXT = "Skipped";
 
     // Dropdown states
     const [open, setOpen] = useState(false);
@@ -108,15 +109,26 @@ const BusinessUser = () => {
     };
 
     const handleSkip = () => {
-        const data = {
-            organizationName: null,
-            industry: null,
-            organizationSize: null,
+        setOrganizationName(SKIPPED_TEXT);
+        setSelectedIndustry(SKIPPED_TEXT);
+        setSelectedSize(SKIPPED_TEXT);
+
+        const existingData =
+            JSON.parse(localStorage.getItem("signupData")) || {};
+
+        const updatedData = {
+            ...existingData,
+            organizationName: SKIPPED_TEXT,
+            industry: SKIPPED_TEXT,
+            organizationSize: SKIPPED_TEXT,
         };
 
-        localStorage.setItem("businessUser", JSON.stringify(data));
+        localStorage.setItem("signupData", JSON.stringify(updatedData));
+
+        console.log("🟡 Business skipped with text:", updatedData);
         navigate("/allusers");
     };
+
 
     const handleInputChange = (e) => {
         const value = e.target.value;
@@ -230,6 +242,7 @@ const BusinessUser = () => {
                             type="text"
                             placeholder="Enter your company name"
                             value={organizationName}
+                            disabled={organizationName === SKIPPED_TEXT}
                             onChange={handleInputChange}
                             onKeyPress={handleKeyPress}
                             className={getInputStyles()}
@@ -255,6 +268,7 @@ const BusinessUser = () => {
                             <input
                                 type="text"
                                 readOnly
+                                disabled={selectedIndustry === SKIPPED_TEXT}
                                 value={selectedIndustry || "Select industry"}
                                 onClick={() => {
                                     setIndustryOpen(!industryOpen);
@@ -380,6 +394,7 @@ const BusinessUser = () => {
                             <input
                                 type="text"
                                 readOnly
+                                disabled={selectedSize === SKIPPED_TEXT}
                                 value={selectedSize || "Select size"}
                                 onClick={() => {
                                     setOpen(!open);
