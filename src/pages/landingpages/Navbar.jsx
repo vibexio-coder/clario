@@ -44,7 +44,7 @@ const USER_MENU = [
     { label: " Security", to: "/security" },
     { label: "Subscription", to: "/subscription" },
     { label: "Billing & Invoices", to: "/billinginvoices" },
-    { label: "Help & Support", to: "/accountpage" },
+    { label: "Help & Support", to: "/helpsupport" },
     {
         label: "Logout",
         action: "logout",

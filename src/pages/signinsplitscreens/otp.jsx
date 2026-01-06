@@ -7,6 +7,8 @@ const Otp = () => {
     const [otp, setOtp] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const [message, setMessage] = useState("");
+
 
     // The correct OTP code
     const correctOtp = "123456";
@@ -44,7 +46,24 @@ const Otp = () => {
             setError("Invalid verification code. Please try again.");
         }
     };
+    const handleResendOtp = async () => {
+        try {
+            const email = localStorage.getItem("loginValue");
 
+            const res = await api.post("/auth/forgot-password", { email });
+
+            if (res.data.alreadySent) {
+                setMessage("OTP already sent. Please check your email.");
+            } else {
+                setMessage("New OTP sent to your email.");
+            }
+
+            setError(""); // clear error
+        } catch (err) {
+            setMessage("");
+            setError("Unable to resend OTP. Please try again later.");
+        }
+    };
 
     const handleKeyPress = (e) => {
         if (e.key === "Enter") {
@@ -105,6 +124,14 @@ const Otp = () => {
                             </span>
                         </div>
                     )}
+                    {message && (
+                        <div className="flex items-start gap-1 mt-1">
+                            <span className="font-avenir font-[400] text-[12px] leading-[26px] text-[#21527D] italic">
+                                {message}
+                            </span>
+                        </div>
+                    )}
+
                 </div>
 
                 {/* Continue Button */}
@@ -115,7 +142,9 @@ const Otp = () => {
                     Verify & Continue
                 </button>
 
-                <div className="font-avenir font-bold text-[16px] leading-[26px] tracking-[0%] text-[#21527D] text-center cursor-pointer">
+                <div
+                    onClick={handleResendOtp}
+                    className="font-avenir font-bold text-[16px] leading-[26px] tracking-[0%] text-[#21527D] text-center cursor-pointer">
                     Didn't receive the code? Resend
                 </div>
             </div>

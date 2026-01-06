@@ -74,7 +74,11 @@ const Password = () => {
 
             navigate("/otp", { state: { from: "forgot-password" } });
         } catch (err) {
-            setError("Failed to send OTP. Please try again.");
+            if (err.response?.status === 429) {
+                setError(err.response.data.message);
+            } else {
+                setError("Failed to send OTP. Please try again.");
+            }
         }
     };
 
