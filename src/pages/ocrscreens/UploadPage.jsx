@@ -19,11 +19,14 @@ import ExtractingFilesPopup from '../ocrpopups/ExtractingFilesPopup';
 import Footer from '../landingpages/Footer';
 import Navbar from '../landingpages/Navbar';
 import PlusIcon from '../../assets/icons/uploadpage/PlusIcon';
+import { useNavigate } from 'react-router-dom';
 
 const UploadPage = () => {
     const [open, setOpen] = useState(false);
     const [showChooseFormatPopup, setShowChooseFormatPopup] = useState(false);
     const [showExtractingPopup, setShowExtractingPopup] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const navigate = useNavigate();
 
     // New state variables for the features
     const [zoomLevel, setZoomLevel] = useState(100);
@@ -110,13 +113,13 @@ const UploadPage = () => {
                     pageCount: file.pageCount || 1
                 };
             });
-            
+
             const filesToSave = await Promise.all(savePromises);
-            
+
             // ✅ Save to BOTH storage locations with SAME data
             localStorage.setItem('uploadPageFiles', JSON.stringify(filesToSave));
             localStorage.setItem('originalExtractFiles', JSON.stringify(filesToSave));
-            
+
         } catch (error) {
             console.error('Error saving to sync storage:', error);
         }
@@ -128,12 +131,12 @@ const UploadPage = () => {
             // Check for files from InvoiceDoc.jsx FIRST
             const invoiceDocFiles = localStorage.getItem('invoiceDocFiles');
             const currentOCRType = localStorage.getItem('currentOCRType');
-            
+
             // Check for existing uploadPageFiles
             const existingUploadPageFiles = localStorage.getItem('uploadPageFiles');
-            
+
             let filesToLoad = [];
-            
+
             if (existingUploadPageFiles) {
                 // Load existing uploadPageFiles (already in sync with OriginalExtractPage)
                 try {
@@ -147,28 +150,28 @@ const UploadPage = () => {
                 try {
                     const parsedFiles = JSON.parse(invoiceDocFiles);
                     filesToLoad = [...filesToLoad, ...parsedFiles];
-                    
+
                     // Immediately save to sync storage for OriginalExtractPage
                     localStorage.setItem('uploadPageFiles', JSON.stringify(parsedFiles));
                     localStorage.setItem('originalExtractFiles', JSON.stringify(parsedFiles));
-                    
+
                     // Clean up InvoiceDoc storage
                     localStorage.removeItem('invoiceDocFiles');
-                    
+
                 } catch (error) {
                     console.error('Error loading InvoiceDoc files:', error);
                 }
             }
-            
+
             // Process loaded files
             if (filesToLoad.length > 0) {
                 const filesWithObjects = filesToLoad.map(fileData => {
                     const file = base64ToFile(fileData.base64, fileData.name, fileData.type);
-                    
+
                     // Get the icon component
                     const fileExtension = fileData.name.split('.').pop().toLowerCase();
                     const IconComponent = fileIconMap[fileExtension] || PdfIcon;
-                    
+
                     return {
                         id: fileData.id || Date.now() + Math.random(),
                         name: fileData.name,
@@ -179,12 +182,12 @@ const UploadPage = () => {
                         pageCount: fileData.pageCount || 1
                     };
                 });
-                
+
                 // Set files in state
                 setUploadedFiles(filesWithObjects);
                 setTotalPages(filesWithObjects.reduce((sum, file) => sum + file.pageCount, 0));
             }
-            
+
             // Get OCR type
             if (currentOCRType) {
                 setOcrType(currentOCRType);
@@ -206,42 +209,42 @@ const UploadPage = () => {
         fileInput.type = 'file';
         fileInput.multiple = true;
         fileInput.accept = '.pdf,.png,.svg,.webp,.jpg,.jpeg';
-        
+
         fileInput.onchange = async (e) => {
             const files = Array.from(e.target.files);
-            
+
             for (const [index, file] of files.entries()) {
                 // Check if file type is allowed
                 if (!ALLOWED_TYPES.includes(file.type) && !file.name.toLowerCase().match(/\.(pdf|png|svg|webp|jpg|jpeg)$/)) {
                     alert(`File ${file.name} is not a supported type. Please upload PDF, PNG, SVG, WEBP, JPEG, or JPG files only.`);
                     continue;
                 }
-                
+
                 // Check for duplicate file
-                const isDuplicate = uploadedFiles.some(uploadedFile => 
-                    uploadedFile.name === file.name && 
+                const isDuplicate = uploadedFiles.some(uploadedFile =>
+                    uploadedFile.name === file.name &&
                     uploadedFile.file.size === file.size
                 );
-                
+
                 if (isDuplicate) {
                     alert(`File "${file.name}" is already uploaded.`);
                     continue;
                 }
-                
+
                 // Generate a unique ID for the file
                 const fileId = Date.now() + index;
-                
+
                 // Get file extension for icon
                 const fileExtension = file.name.split('.').pop().toLowerCase();
                 const IconComponent = fileIconMap[fileExtension] || PdfIcon;
-                
+
                 // Calculate page count based on file type
                 let pageCount = 1;
-                
+
                 if (file.type === 'application/pdf') {
                     pageCount = Math.floor(Math.random() * 20) + 1;
                 }
-                
+
                 // Add file to uploaded files list
                 const newFile = {
                     id: fileId,
@@ -252,15 +255,15 @@ const UploadPage = () => {
                     status: 'uploading',
                     pageCount: pageCount
                 };
-                
+
                 setUploadedFiles(prev => [...prev, newFile]);
                 setTotalPages(prev => prev + pageCount);
-                
+
                 // Start upload simulation
                 simulateUpload(fileId);
             }
         };
-        
+
         fileInput.click();
     };
 
@@ -272,13 +275,13 @@ const UploadPage = () => {
             if (progress >= 100) {
                 progress = 100;
                 clearInterval(interval);
-                
+
                 setUploadStatus(prev => ({
                     ...prev,
                     [fileId]: 'Uploaded'
                 }));
             }
-            
+
             setUploadProgress(prev => ({
                 ...prev,
                 [fileId]: progress
@@ -293,10 +296,10 @@ const UploadPage = () => {
             // Subtract page count from total
             setTotalPages(prev => prev - (fileToDelete.pageCount || 1));
         }
-        
+
         // Remove from state
         setUploadedFiles(prev => prev.filter(file => file.id !== fileId));
-        
+
         // If we're deleting the currently previewed file
         if (uploadedFiles[currentPreviewIndex]?.id === fileId) {
             setCurrentPreviewIndex(prev => {
@@ -335,7 +338,7 @@ const UploadPage = () => {
     // ✅ Delete function (right side delete icon)
     const handleDelete = () => {
         setIsTextDeleted(true);
-        
+
         // If there's a current preview file, delete it
         if (currentPreviewFile) {
             handleDeleteFile(currentPreviewFile.id);
@@ -476,8 +479,8 @@ const UploadPage = () => {
             const imageUrl = URL.createObjectURL(file);
             return (
                 <div className="h-full w-full flex items-center justify-center overflow-hidden">
-                    <img 
-                        src={imageUrl} 
+                    <img
+                        src={imageUrl}
                         alt={file.name}
                         className="max-h-full max-w-full object-contain transition-transform duration-300"
                         style={{
@@ -490,7 +493,7 @@ const UploadPage = () => {
         } else if (isPDF) {
             return (
                 <div className="h-full w-full flex flex-col">
-                    <div 
+                    <div
                         ref={textContainerRef}
                         className="flex-1 overflow-auto scrollbar-hide"
                         style={{
@@ -528,6 +531,209 @@ const UploadPage = () => {
         );
     };
 
+    const callFastAPI = async (filesToProcess) => {
+        if (!ocrType || filesToProcess.length === 0) {
+            alert('No files to process or OCR type not selected');
+            return null;
+        }
+
+        setIsProcessing(true);
+
+        try {
+            // ✅ USE THE NGROK URL, NOT localhost
+            const FASTAPI_URL = "https://e89d4d272ec0.ngrok-free.app";
+            const endpoint = ocrType === 'invoice' ? 'invoice' : 'raw_ocr';
+
+            console.log(`Calling FastAPI: ${FASTAPI_URL}/${endpoint}`);
+
+            // Create FormData object
+            const formData = new FormData();
+            filesToProcess.forEach(file => {
+                formData.append('files', file.file);
+                console.log(`Adding file: ${file.name}`);
+            });
+
+            // Call FastAPI with ngrok URL
+            const response = await fetch(`${FASTAPI_URL}/${endpoint}`, {
+                method: 'POST',
+                body: formData,
+                // Add timeout
+                signal: AbortSignal.timeout(60000) // 60 seconds timeout
+            });
+
+            console.log('Response status:', response.status);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Response error:', errorText);
+                throw new Error(`API Error: ${response.status} - ${errorText}`);
+            }
+
+            const apiResponse = await response.json();
+            console.log('FastAPI response received:', apiResponse);
+
+            // Store API response for OriginalExtractPage
+            localStorage.setItem('fastapiResponse', JSON.stringify({
+                response: apiResponse,
+                ocrType: ocrType,
+                processedFiles: filesToProcess.map(f => ({
+                    id: f.id,
+                    name: f.name,
+                    type: f.file.type
+                }))
+            }));
+
+            return apiResponse;
+
+        } catch (error) {
+            console.error('FastAPI call failed:', error);
+
+            // Check if it's a connection error
+            if (error.name === 'AbortError' || error.message.includes('Failed to fetch')) {
+                alert(
+                    `⚠️ Cannot connect to FastAPI server.\n\n` +
+                    `Please check:\n` +
+                    `1. The ngrok URL: https://67f02d4dfa1a.ngrok-free.app\n` +
+                    `2. Ask your AI developer if server is running\n` +
+                    `3. Try again in a few moments`
+                );
+            } else {
+                alert(`Error processing files: ${error.message}`);
+            }
+            return null;
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+    
+    const handleExtractAction = async (extractAll = false) => {
+        if (uploadedFiles.length === 0) return;
+
+        // Determine which files to process
+        const filesToProcess = extractAll
+            ? uploadedFiles
+            : [uploadedFiles[currentPreviewIndex]];
+
+        // Show extracting popup
+        if (ocrType === 'invoice') {
+            setShowExtractingPopup(true);
+        } else {
+            setShowChooseFormatPopup(true);
+        }
+
+        // Call FastAPI
+        const apiResponse = await callFastAPI(filesToProcess);
+
+        if (apiResponse) {
+            // Close popups
+            setShowChooseFormatPopup(false);
+            setShowExtractingPopup(false);
+
+            // Navigate to OriginalExtractPage
+            navigate('/originalextractPage');
+        } else {
+            // Close popups on error
+            setShowChooseFormatPopup(false);
+            setShowExtractingPopup(false);
+        }
+    };
+
+    const processFilesWithFastAPI = async (filesToProcess) => {
+        if (!ocrType || filesToProcess.length === 0) {
+            alert('Please select files to process');
+            return null;
+        }
+
+        setIsProcessing(true);
+
+        try {
+            // First, test if FastAPI is reachable
+            console.log('Testing FastAPI connection...');
+
+            // Try different URLs
+            const possibleUrls = [
+                `https://67f02d4dfa1a.ngrok-free.app`,
+                `https://e89d4d272ec0.ngrok-free.app`,
+                'http://localhost:8010',
+                'http://127.0.0.1:8010',
+                'http://0.0.0.0:8010'
+            ];
+
+            let fastapiUrl = '';
+            for (const url of possibleUrls) {
+                try {
+                    const testResponse = await fetch(`${url}/docs`, { method: 'HEAD' });
+                    if (testResponse.ok) {
+                        fastapiUrl = url;
+                        console.log(`Found FastAPI at: ${url}`);
+                        break;
+                    }
+                } catch (e) {
+                    console.log(`Not reachable: ${url}`);
+                }
+            }
+
+            if (!fastapiUrl) {
+                throw new Error('FastAPI server not found. Make sure it\'s running on port 8010.');
+            }
+
+            // Determine endpoint based on OCR type
+            const endpoint = ocrType === 'invoice' ? 'invoice' : 'raw_ocr';
+
+            console.log(`Calling FastAPI: ${fastapiUrl}/${endpoint}`);
+
+            // Create FormData
+            const formData = new FormData();
+            filesToProcess.forEach(file => {
+                formData.append('files', file.file);
+                console.log(`Adding file: ${file.name}, size: ${file.file.size} bytes`);
+            });
+
+            // Call FastAPI
+            const response = await fetch(`${fastapiUrl}/${endpoint}`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            console.log('Response status:', response.status);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Response error:', errorText);
+                throw new Error(`API Error: ${response.status} - ${errorText}`);
+            }
+
+            const apiResponse = await response.json();
+            console.log('FastAPI response received:', apiResponse);
+
+            // Store the API response for OriginalExtractPage
+            localStorage.setItem('fastapiResponse', JSON.stringify({
+                response: apiResponse,
+                ocrType: ocrType,
+                processedFiles: filesToProcess.map(f => ({
+                    id: f.id,
+                    name: f.name,
+                    type: f.file.type
+                }))
+            }));
+
+            return apiResponse;
+
+        } catch (error) {
+            console.error('FastAPI processing error:', error);
+
+            // More user-friendly error message
+            let errorMessage = error.message;
+            if (error.message.includes('Failed to fetch') || error.message.includes('ERR_CONNECTION_REFUSED')) {
+                errorMessage = 'Cannot connect to FastAPI server. Please make sure:\n1. FastAPI is running on port 8010\n2. Run: python main.py or uvicorn main:app --port 8010\n3. Check firewall/antivirus settings';
+            }
+
+            alert(`Error: ${errorMessage}`);
+            return null;
+        } finally {
+            setIsProcessing(false);
+        }
+    };
     return (
         <div>
             <Navbar />
@@ -562,7 +768,7 @@ const UploadPage = () => {
                                         uploadedFiles.map((file) => {
                                             const progress = uploadProgress[file.id] || file.progress || 0;
                                             const status = uploadStatus[file.id] || file.status || (progress < 100 ? 'Uploading...' : 'Uploaded');
-                                            
+
                                             return (
                                                 <div
                                                     key={file.id}
@@ -585,7 +791,7 @@ const UploadPage = () => {
                                                         </p>
                                                     </div>
                                                     <div className="flex items-center gap-3">
-                                                        <button 
+                                                        <button
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 handleDeleteFile(file.id);
@@ -613,7 +819,7 @@ const UploadPage = () => {
                                     Uploaded Files
                                 </h2>
                                 <div className="flex items-center gap-2">
-                                    <button 
+                                    <button
                                         onClick={() => setCurrentPreviewIndex(prev => Math.max(0, prev - 1))}
                                         disabled={currentPreviewIndex === 0 || uploadedFiles.length === 0}
                                     >
@@ -626,7 +832,7 @@ const UploadPage = () => {
                                     <div className="font-avenir font-normal text-[16px] leading-[100%] text-[#000000]">
                                         {uploadedFiles.length > 0 ? uploadedFiles.length : 0}
                                     </div>
-                                    <button 
+                                    <button
                                         onClick={() => setCurrentPreviewIndex(prev => Math.min(uploadedFiles.length - 1, prev + 1))}
                                         disabled={currentPreviewIndex >= uploadedFiles.length - 1 || uploadedFiles.length === 0}
                                     >
@@ -691,7 +897,7 @@ const UploadPage = () => {
                             </div>
 
                             <div className="flex items-center gap-1 xm:gap-2 px-4 border-r border-[#21527D]/20">
-                                <button 
+                                <button
                                     onClick={() => setCurrentPreviewIndex(prev => Math.max(0, prev - 1))}
                                     disabled={currentPreviewIndex === 0 || uploadedFiles.length === 0}
                                     className={currentPreviewIndex === 0 || uploadedFiles.length === 0 ? 'opacity-50 cursor-not-allowed' : ' cursor-pointer'}
@@ -705,12 +911,12 @@ const UploadPage = () => {
                                 <div className="font-avenir font-normal text-[16px] leading-[100%] text-[#000000]">
                                     {uploadedFiles.length > 0 ? totalPages : 0}
                                 </div>
-                                <button 
+                                <button
                                     onClick={() => setCurrentPreviewIndex(prev => Math.min(uploadedFiles.length - 1, prev + 1))}
                                     disabled={currentPreviewIndex >= uploadedFiles.length - 1 || uploadedFiles.length === 0}
                                     className={currentPreviewIndex >= uploadedFiles.length - 1 || uploadedFiles.length === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                                 >
-                                    <RightArrowIcon  />
+                                    <RightArrowIcon />
                                 </button>
                             </div>
 
@@ -722,15 +928,15 @@ const UploadPage = () => {
                                 >
                                     <TextIcon width={24} height={24} color="#000000" />
                                 </button>
-                                <button 
-                                    onClick={handleRotate} 
+                                <button
+                                    onClick={handleRotate}
                                     disabled={!currentPreviewFile}
                                     className={`hover:opacity-80 ${!currentPreviewFile ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                     <RefreshRotateIcon />
                                 </button>
-                                <button 
-                                    onClick={handleDelete} 
+                                <button
+                                    onClick={handleDelete}
                                     disabled={!currentPreviewFile}
                                     className={`hover:opacity-80 ${!currentPreviewFile ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
@@ -742,34 +948,18 @@ const UploadPage = () => {
                         {/* Action Buttons */}
                         <div className="flex flex-col sm:flex-row items-center gap-4 mt-2 justify-center">
                             <button
-                                onClick={() => {
-                                    if (!currentPreviewFile) return;
-                                    
-                                    if (ocrType === 'invoice') {
-                                        setShowExtractingPopup(true);
-                                    } else {
-                                        setShowChooseFormatPopup(true);
-                                    }
-                                }}
-                                disabled={!currentPreviewFile}
-                                className={`font-avenir font-semibold lg:font-bold text-[16px] leading-[100%] text-[#21527D] bg-[#E7EDF2] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-[260px] h-[55px] rounded-[15px] flex items-center justify-center cursor-pointer ${!currentPreviewFile ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
+                                onClick={() => handleExtractAction(false)}
+                                disabled={!currentPreviewFile || isProcessing}
+                                className={`font-avenir font-semibold lg:font-bold text-[16px] leading-[100%] text-[#21527D] bg-[#E7EDF2] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-[260px] h-[55px] rounded-[15px] flex items-center justify-center cursor-pointer ${!currentPreviewFile || isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
                             >
-                                Extract This File
+                                {isProcessing ? 'Processing...' : 'Extract This File'}
                             </button>
                             <button
-                                onClick={() => {
-                                    if (uploadedFiles.length === 0) return;
-                                    
-                                    if (ocrType === 'invoice') {
-                                        setShowExtractingPopup(true);
-                                    } else {
-                                        setShowChooseFormatPopup(true);
-                                    }
-                                }}
-                                disabled={uploadedFiles.length === 0}
-                                className={`font-avenir font-semibold lg:font-bold text-[16px] leading-[100%] text-[#FDFDFD] bg-[#21527D] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-[250px] h-[55px] rounded-[15px] flex items-center justify-center cursor-pointer ${uploadedFiles.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
+                                onClick={() => handleExtractAction(true)}
+                                disabled={uploadedFiles.length === 0 || isProcessing}
+                                className={`font-avenir font-semibold lg:font-bold text-[16px] leading-[100%] text-[#FDFDFD] bg-[#21527D] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-[250px] h-[55px] rounded-[15px] flex items-center justify-center cursor-pointer ${uploadedFiles.length === 0 || isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
                             >
-                                Extract All
+                                {isProcessing ? 'Processing All...' : 'Extract All'}
                             </button>
                         </div>
                     </div>
@@ -789,7 +979,7 @@ const UploadPage = () => {
                 )}
                 {showExtractingPopup && (
                     <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
-                        <ExtractingFilesPopup 
+                        <ExtractingFilesPopup
                             closePopup={() => setShowExtractingPopup(false)}
                             uploadedFiles={uploadedFiles}
                             currentPreviewIndex={currentPreviewIndex}

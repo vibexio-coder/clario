@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import icon from "../../assets/images/icon.webp";
 import DownArrowIconForm from "../../assets/icons/DownArrowIconForm";
@@ -16,6 +16,26 @@ const AllUsers = () => {
     // Ref for dropdown
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const savedData = JSON.parse(localStorage.getItem("signupData"));
+
+        if (savedData) {
+            if (savedData.primaryUseCase) {
+                // If previously selected "Other", keep dropdown value as Other
+                if (savedData.primaryUseCase === "Other") {
+                    setSelectedUseCase("Other");
+                } else {
+                    setSelectedUseCase(savedData.primaryUseCase);
+                }
+            }
+
+            if (savedData.otherUseCase) {
+                setOtherUseCase(savedData.otherUseCase);
+            }
+        }
+    }, []);
+
 
     const validateUseCase = () => {
         if (!selectedUseCase || selectedUseCase === "Select size") {
@@ -99,8 +119,26 @@ const AllUsers = () => {
         setSelectedUseCase(useCase);
         setOpen(false);
 
+        const existing = JSON.parse(localStorage.getItem("signupData")) || {};
+
         if (useCase !== "Other") {
-            setOtherUseCase(""); // 🔹 Other illa na input clear
+            setOtherUseCase("");
+            localStorage.setItem(
+                "signupData",
+                JSON.stringify({
+                    ...existing,
+                    primaryUseCase: useCase,
+                    otherUseCase: "",
+                })
+            );
+        } else {
+            localStorage.setItem(
+                "signupData",
+                JSON.stringify({
+                    ...existing,
+                    primaryUseCase: "Other",
+                })
+            );
         }
 
         if (error) {
@@ -193,7 +231,24 @@ const AllUsers = () => {
                         <input
                             type="text"
                             value={otherUseCase}
-                            onChange={(e) => setOtherUseCase(e.target.value)}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setOtherUseCase(value);
+
+                                const existing = JSON.parse(localStorage.getItem("signupData")) || {};
+                                localStorage.setItem(
+                                    "signupData",
+                                    JSON.stringify({
+                                        ...existing,
+                                        primaryUseCase: "Other",
+                                        otherUseCase: value,
+                                    })
+                                );
+
+                                if (error) {
+                                    setError("");
+                                }
+                            }}
                             placeholder="Please specify your use case"
                             className={`w-full mt-2 bg-[#FFFFFF] border rounded-[6px] px-4 py-3
         font-avenir text-[16px] leading-[26px] outline-none

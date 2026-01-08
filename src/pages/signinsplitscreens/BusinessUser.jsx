@@ -134,7 +134,12 @@ const BusinessUser = () => {
         const value = e.target.value;
         setOrganizationName(value);
 
-        // Clear name error when user starts typing
+        const existing = JSON.parse(localStorage.getItem("signupData")) || {};
+        localStorage.setItem(
+            "signupData",
+            JSON.stringify({ ...existing, organizationName: value })
+        );
+
         if (nameError) {
             setNameError("");
         }
@@ -150,7 +155,13 @@ const BusinessUser = () => {
     const handleIndustrySelect = (industry) => {
         setSelectedIndustry(industry);
         setIndustryOpen(false);
-        // Clear industry error when selection is made
+
+        const existing = JSON.parse(localStorage.getItem("signupData")) || {};
+        localStorage.setItem(
+            "signupData",
+            JSON.stringify({ ...existing, industry })
+        );
+
         if (industryError) {
             setIndustryError("");
         }
@@ -160,11 +171,18 @@ const BusinessUser = () => {
     const handleSizeSelect = (size) => {
         setSelectedSize(size);
         setOpen(false);
-        // Clear size error when selection is made
+
+        const existing = JSON.parse(localStorage.getItem("signupData")) || {};
+        localStorage.setItem(
+            "signupData",
+            JSON.stringify({ ...existing, organizationSize: size })
+        );
+
         if (sizeError) {
             setSizeError("");
         }
     };
+
 
     // Toggle section expansion
     const toggleSection = (section) => {
@@ -190,6 +208,22 @@ const BusinessUser = () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+    React.useEffect(() => {
+        const savedData = JSON.parse(localStorage.getItem("signupData"));
+
+        if (savedData) {
+            if (savedData.organizationName)
+                setOrganizationName(savedData.organizationName);
+
+            if (savedData.industry)
+                setSelectedIndustry(savedData.industry);
+
+            if (savedData.organizationSize)
+                setSelectedSize(savedData.organizationSize);
+        }
+    }, []);
+
 
     const getInputStyles = () => {
         const baseStyles = "w-full bg-[#F2F2F2] border rounded-[6px] px-4 py-3 font-avenir text-[16px] leading-[26px] outline-none focus:ring-1 pr-12";

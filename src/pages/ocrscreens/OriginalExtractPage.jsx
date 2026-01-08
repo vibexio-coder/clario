@@ -22,13 +22,16 @@ import Navbar from '../landingpages/Navbar';
 const OriginalExtractPage = () => {
     const [showExportPopup, setShowExportPopup] = useState(false);
     const [open, setOpen] = useState(false);
-    
+
     // State for files - NOW LOADING ONLY FROM uploadPageFiles
     const [originalFiles, setOriginalFiles] = useState([]);
     const [currentFileIndex, setCurrentFileIndex] = useState(0);
     const [originalZoom, setOriginalZoom] = useState(100);
     const [rotation, setRotation] = useState(0);
-    
+    const [fastapiResponse, setFastapiResponse] = useState(null);
+    const [extractedText, setExtractedText] = useState('');
+    const [exportData, setExportData] = useState(null);
+
     // State for extracted section
     const [extractedZoom, setExtractedZoom] = useState(100);
 
@@ -49,15 +52,15 @@ const OriginalExtractPage = () => {
         const loadFilesFromUploadPageStorage = () => {
             // ✅ Load ONLY from uploadPageFiles (this is the sync source)
             const uploadPageFiles = localStorage.getItem('uploadPageFiles');
-            
+
             if (uploadPageFiles) {
                 try {
                     const parsedFiles = JSON.parse(uploadPageFiles);
-                    
+
                     // Convert base64 to File objects
                     const filesWithObjects = parsedFiles.map(fileData => {
                         const file = base64ToFile(fileData.base64, fileData.name, fileData.type);
-                        
+
                         return {
                             id: fileData.id,
                             name: fileData.name,
@@ -68,15 +71,15 @@ const OriginalExtractPage = () => {
                             isPDF: fileData.type === 'application/pdf'
                         };
                     });
-                    
+
                     setOriginalFiles(filesWithObjects);
-                    
+
                     // If there are no files in uploadPageFiles but there are in originalExtractFiles,
                     // clear originalExtractFiles to maintain sync
                     if (parsedFiles.length === 0) {
                         localStorage.removeItem('originalExtractFiles');
                     }
-                    
+
                 } catch (error) {
                     console.error('Error loading uploadPage files:', error);
                 }
@@ -86,10 +89,10 @@ const OriginalExtractPage = () => {
                 if (originalExtractFiles) {
                     try {
                         const parsedFiles = JSON.parse(originalExtractFiles);
-                        
+
                         const filesWithObjects = parsedFiles.map(fileData => {
                             const file = base64ToFile(fileData.base64, fileData.name, fileData.type);
-                            
+
                             return {
                                 id: fileData.id,
                                 name: fileData.name,
@@ -100,7 +103,7 @@ const OriginalExtractPage = () => {
                                 isPDF: fileData.type === 'application/pdf'
                             };
                         });
-                        
+
                         setOriginalFiles(filesWithObjects);
                     } catch (error) {
                         console.error('Error loading originalExtract files:', error);
@@ -108,18 +111,18 @@ const OriginalExtractPage = () => {
                 }
             }
         };
-        
+
         loadFilesFromUploadPageStorage();
-        
+
         // ✅ Listen for storage changes from UploadPage
         const handleStorageChange = (e) => {
             if (e.key === 'uploadPageFiles' || e.key === 'originalExtractFiles') {
                 loadFilesFromUploadPageStorage();
             }
         };
-        
+
         window.addEventListener('storage', handleStorageChange);
-        
+
         return () => {
             window.removeEventListener('storage', handleStorageChange);
         };
@@ -194,8 +197,8 @@ const OriginalExtractPage = () => {
             const imageUrl = URL.createObjectURL(currentFile.file);
             return (
                 <div className="h-full w-full flex items-center justify-center overflow-hidden">
-                    <img 
-                        src={imageUrl} 
+                    <img
+                        src={imageUrl}
                         alt={currentFile.name}
                         className="max-h-full max-w-full object-contain transition-transform duration-300"
                         style={{
@@ -209,7 +212,7 @@ const OriginalExtractPage = () => {
             // For PDFs, show text content
             return (
                 <div className="h-full w-full flex flex-col">
-                    <div 
+                    <div
                         className="flex-1 overflow-auto scrollbar-hide"
                         style={{
                             transform: `rotate(${rotation}deg)`,
@@ -251,7 +254,7 @@ const OriginalExtractPage = () => {
     // Get file icon based on file extension
     const getFileIcon = () => {
         if (!currentFile?.name) return null;
-        
+
         const fileName = currentFile.name.toLowerCase();
         if (fileName.endsWith('.pdf')) return <PdfIcon width={24} height={24} color="#21527D" />;
         if (fileName.endsWith('.png')) return <PngIcon width={24} height={24} color="#21527D" />;
@@ -294,6 +297,98 @@ const OriginalExtractPage = () => {
         };
     }, [showExportPopup, open]);
 
+    // Add this useEffect to load FastAPI response
+    useEffect(() => {
+        // Load FastAPI response from localStorage
+        const savedResponse = localStorage.getItem('fastapiResponse');
+        if (savedResponse) {
+            try {
+                const parsedResponse = JSON.parse(savedResponse);
+                setFastapiResponse(parsedResponse);
+
+                // Extract text based on OCR type
+                if (parsedResponse.ocrType === 'invoice') {
+                    // For invoice OCR, format the structured data
+                    const results = parsedResponse.response.results || [];
+                    const formattedText = results.map((result, index) => {
+                        if (result.status === 'success') {
+                            return `File: ${result.filename}\nData: ${JSON.stringify(result.data, null, 2)}\n`;
+                        } else {
+                            return `File: ${result.filename}\nError: ${result.error}\n`;
+                        }
+                    }).join('\n');
+                    setExtractedText(formattedText);
+
+                    // Store export data for invoices (Excel)
+                    setExportData({
+                        type: 'excel',
+                        data: parsedResponse.response.excel_file,
+                        filename: parsedResponse.response.excel_filename || 'extractions.xlsx'
+                    });
+                } else {
+                    // For document OCR (raw_ocr)
+                    const results = parsedResponse.response.results || [];
+                    const formattedText = results.map((result, index) => {
+                        if (result.status === 'success') {
+                            return `File: ${result.filename}\n\n${result.extracted_text || 'No text extracted'}\n`;
+                        } else {
+                            return `File: ${result.filename}\nError: ${result.error}\n`;
+                        }
+                    }).join('\n---\n');
+                    setExtractedText(formattedText);
+
+                    // Store export data for documents (Word/PDF)
+                    if (results.length > 0 && results[0].status === 'success') {
+                        setExportData({
+                            type: 'document',
+                            wordBase64: results[0].word_file_base64,
+                            pdfBase64: results[0].pdf_file_base64,
+                            wordFilename: results[0].word_filename || 'document.docx',
+                            pdfFilename: results[0].pdf_filename || 'document.pdf'
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error parsing FastAPI response:', error);
+                setExtractedText('Error loading extracted data');
+            }
+        }
+    }, []);
+
+    // Add export/download functions
+    const handleExport = () => {
+        if (!exportData) {
+            alert('No data to export. Please process files first.');
+            return;
+        }
+
+        if (exportData.type === 'excel') {
+            // Export Excel file
+            downloadBase64File(exportData.data, exportData.filename, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        } else {
+            // For document OCR, show options for Word or PDF
+            const exportFormat = window.confirm('Export as Word document? Click OK for Word, Cancel for PDF');
+            if (exportFormat) {
+                downloadBase64File(exportData.wordBase64, exportData.wordFilename, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+            } else {
+                downloadBase64File(exportData.pdfBase64, exportData.pdfFilename, 'application/pdf');
+            }
+        }
+
+        // Show export successful popup
+        setShowExportPopup(true);
+    };
+
+    // Helper function to download base64 files
+    const downloadBase64File = (base64Data, filename, mimeType) => {
+        const link = document.createElement('a');
+        link.href = `data:${mimeType};base64,${base64Data}`;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     return (
         <div>
             <Navbar />
@@ -325,7 +420,7 @@ const OriginalExtractPage = () => {
                                 rounded-[25px] bg-[#FDFDFD]
                                 shadow-[0px_-2px_4px_0px_#21527D1A]
                                 p-4 relative overflow-auto scrollbar-hide">
-                                
+
                                 {/* File Preview Content */}
                                 {renderPreviewContent()}
                             </div>
@@ -358,12 +453,12 @@ const OriginalExtractPage = () => {
 
                             {/* Pagination Section */}
                             <div className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 border-r border-[#21527D]/20">
-                                <button 
+                                <button
                                     onClick={handlePreviousFile}
                                     disabled={currentFileIndex === 0 || originalFiles.length === 0}
                                     className={currentFileIndex === 0 || originalFiles.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}
                                 >
-                                    <LeftPaginationArrowIcon  color="#000000" />
+                                    <LeftPaginationArrowIcon color="#000000" />
                                 </button>
                                 <div className="w-[20px] h-[20px] sm:w-[22px] sm:h-[22px] flex items-center justify-center rounded-[6px] sm:rounded-[8px] bg-[#FFFFFF] text-[#21527D] font-avenir font-black text-[12px] sm:text-[14px] leading-[100%] opacity-[0.70]">
                                     {originalFiles.length > 0 ? currentFileIndex + 1 : 1}
@@ -372,7 +467,7 @@ const OriginalExtractPage = () => {
                                 <div className="font-avenir font-normal text-[14px] sm:text-[16px] leading-[100%] text-[#000000]">
                                     {originalFiles.length || 1}
                                 </div>
-                                <button 
+                                <button
                                     onClick={handleNextFile}
                                     disabled={currentFileIndex >= originalFiles.length - 1 || originalFiles.length === 0}
                                     className={currentFileIndex >= originalFiles.length - 1 || originalFiles.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}
@@ -410,22 +505,31 @@ const OriginalExtractPage = () => {
                                 </button>
                             </div>
 
-                            {/* Main Display Box */}
                             <div className="w-full max-w-[400px] lg:max-w-full xl:max-w-[450px]
-                                h-[300px] md:h-[310px]
-                                rounded-[25px] bg-[#FDFDFD]
-                                shadow-[0px_-2px_4px_0px_#21527D1A]
-                                p-4 relative overflow-auto scrollbar-hide">
+    h-[300px] md:h-[310px]
+    rounded-[25px] bg-[#FDFDFD]
+    shadow-[0px_-2px_4px_0px_#21527D1A]
+    p-4 relative overflow-auto scrollbar-hide">
                                 <div
                                     style={{
                                         fontSize: `${extractedZoom}%`,
                                         lineHeight: '1.6',
-                                        transition: 'font-size 0.3s ease'
+                                        transition: 'font-size 0.3s ease',
+                                        whiteSpace: 'pre-wrap',
+                                        fontFamily: 'Avenir, sans-serif'
                                     }}
+                                    className="text-gray-800"
                                 >
-                                    <p className="font-avenir text-[#000000]">
-                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum quaerat qui voluptate recusandae omnis repellat facilis, maxime et, temporibus aut delectus. Debitis quas, nostrum quae eveniet ea, dolorum repudiandae suscipit et esse dignissimos omnis maxime reprehenderit tempore at dolores. Excepturi repellat pariatur minima dignissimos nobis velit tenetur saepe similique dolor!
-                                    </p>
+                                    {fastapiResponse ? (
+                                        extractedText || 'No extracted text available'
+                                    ) : (
+                                        <div className="text-center text-gray-500 italic h-full flex items-center justify-center">
+                                            <div>
+                                                <p>No extracted data available yet.</p>
+                                                <p className="text-sm mt-2">Please process files in Upload Page first.</p>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -497,8 +601,15 @@ const OriginalExtractPage = () => {
 
                     {/* Export Button */}
                     <button
-                        onClick={() => setShowExportPopup(true)}
-                        className="order-3 font-avenir font-bold lg:font-black text-[14px] sm:text-[16px] leading-[100%] text-[#FDFDFD] bg-[#21527D] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-auto min-w-[120px] sm:min-w-[200px] lg:min-w-[220px] lg:min-w-[240px] h-[45px] sm:h-[50px] md:h-[55px] rounded-[12px] sm:rounded-[15px] flex items-center justify-center hover:opacity-90 transition-opacity">
+                        onClick={() => {
+                            if (fastapiResponse && exportData) {
+                                handleExport();
+                            } else {
+                                alert('Please wait for files to be processed and extracted data to load.');
+                            }
+                        }}
+                        disabled={!fastapiResponse || !exportData}
+                        className={`order-3 font-avenir font-bold lg:font-black text-[14px] sm:text-[16px] leading-[100%] text-[#FDFDFD] bg-[#21527D] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-auto min-w-[120px] sm:min-w-[200px] lg:min-w-[220px] lg:min-w-[240px] h-[45px] sm:h-[50px] md:h-[55px] rounded-[12px] sm:rounded-[15px] flex items-center justify-center hover:opacity-90 transition-opacity ${!fastapiResponse || !exportData ? 'opacity-50 cursor-not-allowed' : ''}`}>
                         Export
                     </button>
 

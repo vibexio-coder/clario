@@ -41,7 +41,7 @@ const Otp = () => {
 
             setError("");
             localStorage.setItem("resetEmail", email);
-            navigate("/newpassword"); // 👈 direct route
+            navigate("/newpassword"); 
         } catch (err) {
             setError("Invalid verification code. Please try again.");
         }
