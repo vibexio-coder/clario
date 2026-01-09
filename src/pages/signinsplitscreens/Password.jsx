@@ -38,6 +38,9 @@ const Password = () => {
 
             localStorage.setItem("userId", res.data.userId);
 
+            if (loginType === "email") {
+                localStorage.setItem("email", loginValue.toLowerCase());
+            }
             localStorage.removeItem("loginType");
             localStorage.removeItem("loginValue");
 

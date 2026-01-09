@@ -95,6 +95,9 @@ const AllUsers = () => {
             const res = await api.post("/auth/signup", finalPayload);
 
             localStorage.setItem("userId", res.data.userId);
+            if (finalPayload.email) {
+                localStorage.setItem("email", finalPayload.email.toLowerCase());
+            }
             localStorage.removeItem("signupData");
 
             navigate("/account");

@@ -20,6 +20,13 @@ import Footer from '../landingpages/Footer';
 import Navbar from '../landingpages/Navbar';
 import PlusIcon from '../../assets/icons/uploadpage/PlusIcon';
 import { useNavigate } from 'react-router-dom';
+import { Document, Page, pdfjs } from "react-pdf";
+
+import "react-pdf/dist/Page/TextLayer.css";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+
+pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+
 
 const UploadPage = () => {
     const [open, setOpen] = useState(false);
@@ -27,6 +34,7 @@ const UploadPage = () => {
     const [showExtractingPopup, setShowExtractingPopup] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const navigate = useNavigate();
+    const [pdfPages, setPdfPages] = useState({});
 
     // New state variables for the features
     const [zoomLevel, setZoomLevel] = useState(100);
@@ -47,6 +55,13 @@ const UploadPage = () => {
     const [uploadStatus, setUploadStatus] = useState({});
     const [totalPages, setTotalPages] = useState(0);
     const [ocrType, setOcrType] = useState(null);
+
+    const onPdfLoadSuccess = (numPages, fileId) => {
+        setPdfPages(prev => ({
+            ...prev,
+            [fileId]: numPages
+        }));
+    };
 
     // Allowed file types
     const ALLOWED_TYPES = [
@@ -410,6 +425,8 @@ const UploadPage = () => {
         });
     };
 
+
+
     const handleMouseUp = () => {
         setIsDragging(false);
         setCropResizeMode(null);
@@ -461,6 +478,8 @@ const UploadPage = () => {
         };
     }, [showChooseFormatPopup, showExtractingPopup]);
 
+
+
     // Render preview content based on file type
     const renderPreviewContent = () => {
         if (!currentPreviewFile) {
@@ -490,36 +509,31 @@ const UploadPage = () => {
                     />
                 </div>
             );
-        } else if (isPDF) {
+        }
+        else if (isPDF) {
             return (
-                <div className="h-full w-full flex flex-col">
-                    <div
-                        ref={textContainerRef}
-                        className="flex-1 overflow-auto scrollbar-hide"
-                        style={{
-                            transform: `rotate(${rotation}deg)`,
-                            transformOrigin: 'center center',
-                            transition: 'transform 0.3s ease'
-                        }}
+                <div className="h-full w-full overflow-auto">
+                    <Document
+                        file={file}
+                        onLoadSuccess={({ numPages }) =>
+                            onPdfLoadSuccess(numPages, currentPreviewFile.id)
+                        }
+                        loading={<p className="text-center">Loading PDF...</p>}
+                        error={<p className="text-center text-red-500">Failed to load PDF</p>}
                     >
-                        <div
-                            style={{
-                                fontSize: `${zoomLevel}%`,
-                                lineHeight: '1.5',
-                                padding: '10px',
-                                transition: 'font-size 0.3s ease'
-                            }}
-                            className='scrollbar-hide overflow-auto h-full'
-                        >
-                            <div className="text-gray-800">
-                                <p className="mb-3">PDF Document Content (Page 1)</p>
-                                <p className="mb-3">This is the extracted text from the uploaded PDF file.</p>
-                                <p className="mb-3">The text is displayed here without showing any file names.</p>
-                                <p className="mb-3">Actual PDF text extraction would be implemented here.</p>
-                                <p className="mb-3">All text content from the PDF appears in this preview area.</p>
-                            </div>
-                        </div>
-                    </div>
+                        {pdfPages[currentPreviewFile.id] &&
+                            Array.from(
+                                { length: pdfPages[currentPreviewFile.id] },
+                                (_, index) => (
+                                    <div key={index} className="mb-4 flex justify-center">
+                                        <Page
+                                            pageNumber={index + 1}
+                                            width={500}
+                                        />
+                                    </div>
+                                )
+                            )}
+                    </Document>
                 </div>
             );
         }
@@ -541,7 +555,7 @@ const UploadPage = () => {
 
         try {
             // ✅ USE THE NGROK URL, NOT localhost
-            const FASTAPI_URL = "https://3f82dbe259ce.ngrok-free.app";
+            const FASTAPI_URL = "https://8a6df2dcad7f.ngrok-free.app";
             const endpoint = ocrType === 'invoice' ? 'invoice' : 'raw_ocr';
 
             console.log(`Calling FastAPI: ${FASTAPI_URL}/${endpoint}`);
@@ -614,6 +628,10 @@ const UploadPage = () => {
             ? uploadedFiles
             : [uploadedFiles[currentPreviewIndex]];
 
+        // Store the count of files being processed in localStorage
+        const fileCount = filesToProcess.length;
+        localStorage.setItem('processingFileCount', fileCount.toString());
+
         // Show extracting popup for BOTH invoice and document
         setShowExtractingPopup(true); // ← ALWAYS show ExtractingFilesPopup
 
@@ -625,15 +643,21 @@ const UploadPage = () => {
             setShowChooseFormatPopup(false);
             setShowExtractingPopup(false);
 
+            // Clean up the stored count
+            localStorage.removeItem('processingFileCount');
+
             // Navigate to OriginalExtractPage
             navigate('/originalextractPage');
         } else {
             // Close popups on error
             setShowChooseFormatPopup(false);
             setShowExtractingPopup(false);
+
+            // Clean up the stored count
+            localStorage.removeItem('processingFileCount');
         }
     };
-    
+
     const processFilesWithFastAPI = async (filesToProcess) => {
         if (!ocrType || filesToProcess.length === 0) {
             alert('Please select files to process');
@@ -649,7 +673,7 @@ const UploadPage = () => {
             // Try different URLs
             const possibleUrls = [
                 `https://67f02d4dfa1a.ngrok-free.app`,
-                `https://3f82dbe259ce.ngrok-free.app`,
+                `https://8a6df2dcad7f.ngrok-free.app`,
                 'http://localhost:8010',
                 'http://127.0.0.1:8010',
                 'http://0.0.0.0:8010'
@@ -977,8 +1001,12 @@ const UploadPage = () => {
                     <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
                         <ExtractingFilesPopup
                             closePopup={() => setShowExtractingPopup(false)}
-                            uploadedFiles={uploadedFiles}
-                            currentPreviewIndex={currentPreviewIndex}
+                            fileCount={
+                                uploadedFiles.length > 0
+                                    ? (localStorage.getItem('processingFileCount') ||
+                                        (currentPreviewFile ? 1 : uploadedFiles.length))
+                                    : 0
+                            }
                         />
                     </div>
                 )}

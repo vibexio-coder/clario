@@ -33,6 +33,7 @@ import Security from './pages/accountpages/Security';
 import Subscription from './pages/accountpages/Subscription';
 import BillingInvoices from './pages/accountpages/BillingInvoices';
 import NewPassword from './pages/signinsplitscreens/NewPassword';
+import FileTesting from './pages/demolandingpages/FileTesting.Jsx';
 
 const App = () => {
   return (
@@ -68,6 +69,7 @@ const App = () => {
         <Route path="/security" element={<Security />} />
         <Route path="/subscription" element={<Subscription />} />
         <Route path="/billinginvoices" element={<BillingInvoices />} />
+        <Route path="/filetesting" element={<FileTesting />} />
       </Routes>
     </div>
   );

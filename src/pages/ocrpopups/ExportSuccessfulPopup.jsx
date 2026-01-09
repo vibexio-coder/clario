@@ -1,16 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import CheckCircleIcon from '../../assets/icons/popupscreens/CheckCircleIcon';
 import CloseIcon from '../../assets/icons/loginpages/CloseIcon';
 
 const ExportSuccessfulPopup = ({ closePopup }) => {
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            closePopup();
+        }, 1000); // ⏱️ 1 minute = 60000 ms
+
+        return () => clearTimeout(timer); // cleanup
+    }, [closePopup]);
+
     return (
         <div className="w-[90%] max-w-[400px] rounded-[40px] 
                         shadow-[0px_16px_25.2px_7px_#1A55701A]
                         p-8 sm:p-10 flex flex-col items-center gap-6 relative bg-[#FDFDFD]">
 
             {/* Close Button */}
-            <div className="absolute right-6 top-6 cursor-pointer"
-                onClick={closePopup}>
+            <div
+                className="absolute right-6 top-6 cursor-pointer"
+                onClick={closePopup}
+            >
                 <CloseIcon />
             </div>
 

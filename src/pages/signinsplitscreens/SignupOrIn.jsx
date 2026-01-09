@@ -90,9 +90,9 @@ const SignupOrIn = () => {
                     placeholder="name@gmail.com"
                     value={email}
                     onChange={(e) => {
-                        setEmail(e.target.value.toLowerCase());
+                        const value = e.target.value.toLowerCase();
                         setEmail(value);
-                        localStorage.setItem("loginValue", value); // 👈 SAVE HERE
+                        localStorage.setItem("loginValue", value);
                         localStorage.setItem("loginType", "email");
                         if (error) setError("");
                     }}
