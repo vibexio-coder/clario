@@ -9,44 +9,72 @@ const Account = () => {
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [mobile, setMobile] = useState("");
-    const [error, setError] = useState("");
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const navigate = useNavigate();
+
+    // Separate error states for each field
+    const [fullNameError, setFullNameError] = useState("");
+    const [emailError, setEmailError] = useState("");
+    const [mobileError, setMobileError] = useState("");
 
     // Add states for edit mode
     const [isEditingName, setIsEditingName] = useState(false);
     const [isEditingMobile, setIsEditingMobile] = useState(false);
 
-
-    const getInputStyles = () => {
+    const getInputStyles = (hasError) => {
         const baseStyles =
             "max-[400px] md:max-w-[500px] w-full bg-[#F2F2F2] border rounded-[6px] px-4 py-3 font-avenir text-[16px] leading-[26px] outline-none focus:ring-1 pr-12 transition-colors duration-200";
 
-        if (error) {
+        if (hasError) {
             return `${baseStyles} border-[#F1511B] placeholder:text-[#F1511B] text-[#F1511B] focus:ring-[#F1511B] bg-[#FFFFFF]`;
         }
 
         return `${baseStyles} border-[#21527D] placeholder:text-[#21527D]/50 text-[#21527D] focus:ring-[#21527D]`;
     };
 
+    const validateEmail = (value) => {
+        const trimmed = value.trim().toLowerCase();
+
+        if (!trimmed) return "Email required";
+        if (!trimmed.endsWith("@gmail.com")) return "Use Gmail only";
+
+        const regex = /^[a-z0-9._%+-]+@gmail\.com$/;
+        if (!regex.test(trimmed)) return "Invalid Gmail address";
+
+        return "";
+    };
+
     const handleFullNameChange = (e) => {
         setFullName(e.target.value);
-        if (error) setError("");
+        if (fullNameError) setFullNameError("");
     };
 
     const handleEmailChange = (e) => {
-        setEmail(e.target.value);
-        if (error) setError("");
+        const value = e.target.value;
+        setEmail(value);
+
+        const validationError = validateEmail(value);
+        setEmailError(validationError);
     };
 
     const handleMobileChange = (e) => {
         setMobile(e.target.value);
-        if (error) setError("");
+        if (mobileError) setMobileError("");
     };
 
-    const handleKeyPress = (e) => {
+    const handleKeyPress = (e, field) => {
         if (e.key === "Enter" && !e.target.value.trim()) {
-            setError("This field is required");
+            switch (field) {
+                case 'fullName':
+                    setFullNameError("This field is required");
+                    break;
+                case 'email':
+                    setEmailError("This field is required");
+                    break;
+                case 'mobile':
+                    setMobileError("This field is required");
+                    break;
+            }
         }
     };
 
@@ -103,7 +131,8 @@ const Account = () => {
                 setMobile(res.data.phone ?? "None");
             })
             .catch(() => {
-                setError("Failed to load profile");
+                // Set specific error for profile loading
+                setFullNameError("Failed to load profile");
             });
     }, []);
 
@@ -111,33 +140,39 @@ const Account = () => {
         const userId = localStorage.getItem("userId");
 
         if (!fullName.trim()) {
-            setError("Full name is required");
+            setFullNameError("Full name is required");
             return;
         }
 
-        await api.put(`/auth/profile/${userId}`, {
-            fullName,
-        });
-
-        setIsEditingName(false);
+        try {
+            await api.put(`/auth/profile/${userId}`, {
+                fullName,
+            });
+            setIsEditingName(false);
+            setFullNameError("");
+        } catch (error) {
+            setFullNameError("Failed to update name");
+        }
     };
-
 
     const handleUpdateMobile = async () => {
         const userId = localStorage.getItem("userId");
 
         if (!mobile.trim()) {
-            setError("Mobile number is required");
+            setMobileError("Mobile number is required");
             return;
         }
 
-        await api.put(`/auth/profile/${userId}`, {
-            phone: mobile,
-        });
-
-        setIsEditingMobile(false);
+        try {
+            await api.put(`/auth/profile/${userId}`, {
+                phone: mobile,
+            });
+            setIsEditingMobile(false);
+            setMobileError("");
+        } catch (error) {
+            setMobileError("Failed to update mobile number");
+        }
     };
-
 
     const handleDeleteAccount = async () => {
         const userId = localStorage.getItem("userId");
@@ -151,18 +186,21 @@ const Account = () => {
     const handleUpdateEmail = async () => {
         const userId = localStorage.getItem("userId");
 
-        if (!email.trim()) {
-            setError("Email is required");
+        const validationError = validateEmail(email);
+        if (validationError) {
+            setEmailError(validationError);
             return;
         }
 
-        await api.put(`/auth/profile/${userId}`, {
-            email,
-        });
-
-        setEmail(email);
+        try {
+            await api.put(`/auth/profile/${userId}`, {
+                email,
+            });
+            setEmailError("");
+        } catch (error) {
+            setEmailError("Failed to update email");
+        }
     };
-
 
     return (
         <div>
@@ -189,7 +227,8 @@ const Account = () => {
                                         placeholder="Enter your full name"
                                         value={fullName === "None" ? "" : fullName}
                                         onChange={handleFullNameChange}
-                                        className={getInputStyles()}
+                                        onKeyPress={(e) => handleKeyPress(e, 'fullName')}
+                                        className={getInputStyles(fullNameError)}
                                     />
                                 </div>
                                 <button onClick={handleUpdateName}
@@ -204,7 +243,7 @@ const Account = () => {
                                     type="text"
                                     placeholder="Enter your full name"
                                     value={fullName}
-                                    className={getInputStyles()}
+                                    className={getInputStyles(fullNameError)}
                                     disabled
                                 />
                                 <button
@@ -218,10 +257,10 @@ const Account = () => {
                             </div>
                         )}
 
-                        {/* Error */}
-                        {error && (
+                        {/* Error - only shows for fullName */}
+                        {fullNameError && (
                             <p className="font-avenir text-xs sm:text-[12px] text-[#F1511B] italic mt-1">
-                                {error}
+                                {fullNameError}
                             </p>
                         )}
                     </div>
@@ -239,7 +278,8 @@ const Account = () => {
                                     placeholder="Enter your email address"
                                     value={email === "None" ? "" : email}
                                     onChange={handleEmailChange}
-                                    className={getInputStyles()}
+                                    onKeyPress={(e) => handleKeyPress(e, 'email')}
+                                    className={getInputStyles(emailError)}
                                 />
                             </div>
 
@@ -248,7 +288,6 @@ const Account = () => {
                                 className="cursor-pointer font-avenir font-bold text-base sm:text-[15px] lg:text-[16px] leading-[26px] text-[#FFFFFF] bg-[#21527D] w-full sm:w-auto sm:min-w-[160px] h-[40px] rounded-[10px]"
                             >
                                 {email === "None" ? "Add email" : "Change email"}
-
                             </button>
                         </div>
 
@@ -256,10 +295,10 @@ const Account = () => {
                             To change your email, you'll need to verify the new address.
                         </p>
 
-                        {/* Error */}
-                        {error && (
+                        {/* Error - only shows for email */}
+                        {emailError && (
                             <p className="font-avenir text-xs sm:text-[12px] text-[#F1511B] italic mt-1">
-                                {error}
+                                {emailError}
                             </p>
                         )}
                     </div>
@@ -278,7 +317,8 @@ const Account = () => {
                                         placeholder="Enter mobile number"
                                         value={mobile === "None" ? "" : mobile}
                                         onChange={handleMobileChange}
-                                        className={getInputStyles()}
+                                        onKeyPress={(e) => handleKeyPress(e, 'mobile')}
+                                        className={getInputStyles(mobileError)}
                                     />
                                 </div>
                                 <button onClick={handleUpdateMobile}
@@ -293,7 +333,7 @@ const Account = () => {
                                     type="tel"
                                     placeholder="Enter mobile number"
                                     value={mobile}
-                                    className={getInputStyles()}
+                                    className={getInputStyles(mobileError)}
                                     disabled
                                 />
                                 <button
@@ -307,10 +347,10 @@ const Account = () => {
                             </div>
                         )}
 
-                        {/* Error */}
-                        {error && (
+                        {/* Error - only shows for mobile */}
+                        {mobileError && (
                             <p className="font-avenir text-xs sm:text-[12px] text-[#F1511B] italic mt-1">
-                                {error}
+                                {mobileError}
                             </p>
                         )}
                     </div>

@@ -541,7 +541,7 @@ const UploadPage = () => {
 
         try {
             // ✅ USE THE NGROK URL, NOT localhost
-            const FASTAPI_URL = "https://e89d4d272ec0.ngrok-free.app";
+            const FASTAPI_URL = "https://3f82dbe259ce.ngrok-free.app";
             const endpoint = ocrType === 'invoice' ? 'invoice' : 'raw_ocr';
 
             console.log(`Calling FastAPI: ${FASTAPI_URL}/${endpoint}`);
@@ -605,7 +605,7 @@ const UploadPage = () => {
             setIsProcessing(false);
         }
     };
-    
+
     const handleExtractAction = async (extractAll = false) => {
         if (uploadedFiles.length === 0) return;
 
@@ -614,12 +614,8 @@ const UploadPage = () => {
             ? uploadedFiles
             : [uploadedFiles[currentPreviewIndex]];
 
-        // Show extracting popup
-        if (ocrType === 'invoice') {
-            setShowExtractingPopup(true);
-        } else {
-            setShowChooseFormatPopup(true);
-        }
+        // Show extracting popup for BOTH invoice and document
+        setShowExtractingPopup(true); // ← ALWAYS show ExtractingFilesPopup
 
         // Call FastAPI
         const apiResponse = await callFastAPI(filesToProcess);
@@ -637,7 +633,7 @@ const UploadPage = () => {
             setShowExtractingPopup(false);
         }
     };
-
+    
     const processFilesWithFastAPI = async (filesToProcess) => {
         if (!ocrType || filesToProcess.length === 0) {
             alert('Please select files to process');
@@ -653,7 +649,7 @@ const UploadPage = () => {
             // Try different URLs
             const possibleUrls = [
                 `https://67f02d4dfa1a.ngrok-free.app`,
-                `https://e89d4d272ec0.ngrok-free.app`,
+                `https://3f82dbe259ce.ngrok-free.app`,
                 'http://localhost:8010',
                 'http://127.0.0.1:8010',
                 'http://0.0.0.0:8010'

@@ -18,6 +18,7 @@ import JpegIcon from '../../assets/icons/uploadpage/JpegIcon';
 import SvgIcon from '../../assets/icons/uploadpage/SvgIcon';
 import Footer from '../landingpages/Footer';
 import Navbar from '../landingpages/Navbar';
+import DocIcon from '../../assets/icons/uploadpage/DocIcon';
 
 const OriginalExtractPage = () => {
     const [showExportPopup, setShowExportPopup] = useState(false);
@@ -31,6 +32,7 @@ const OriginalExtractPage = () => {
     const [fastapiResponse, setFastapiResponse] = useState(null);
     const [extractedText, setExtractedText] = useState('');
     const [exportData, setExportData] = useState(null);
+    const [showFormatPopup, setShowFormatPopup] = useState(false);
 
     // State for extracted section
     const [extractedZoom, setExtractedZoom] = useState(100);
@@ -363,19 +365,25 @@ const OriginalExtractPage = () => {
         }
 
         if (exportData.type === 'excel') {
-            // Export Excel file
+            // For invoice OCR: export Excel directly
             downloadBase64File(exportData.data, exportData.filename, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            setShowExportPopup(true);
         } else {
-            // For document OCR, show options for Word or PDF
-            const exportFormat = window.confirm('Export as Word document? Click OK for Word, Cancel for PDF');
-            if (exportFormat) {
-                downloadBase64File(exportData.wordBase64, exportData.wordFilename, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-            } else {
-                downloadBase64File(exportData.pdfBase64, exportData.pdfFilename, 'application/pdf');
-            }
+            // For document OCR: show format popup instead of alert
+            setShowFormatPopup(true);
+        }
+    };
+
+    const handleFormatSelect = (format) => {
+        if (!exportData) return;
+
+        if (format === 'pdf') {
+            downloadBase64File(exportData.pdfBase64, exportData.pdfFilename, 'application/pdf');
+        } else if (format === 'doc') {
+            downloadBase64File(exportData.wordBase64, exportData.wordFilename, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
         }
 
-        // Show export successful popup
+        setShowFormatPopup(false);
         setShowExportPopup(true);
     };
 
@@ -612,6 +620,44 @@ const OriginalExtractPage = () => {
                         className={`order-3 font-avenir font-bold lg:font-black text-[14px] sm:text-[16px] leading-[100%] text-[#FDFDFD] bg-[#21527D] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-auto min-w-[120px] sm:min-w-[200px] lg:min-w-[220px] lg:min-w-[240px] h-[45px] sm:h-[50px] md:h-[55px] rounded-[12px] sm:rounded-[15px] flex items-center justify-center hover:opacity-90 transition-opacity ${!fastapiResponse || !exportData ? 'opacity-50 cursor-not-allowed' : ''}`}>
                         Export
                     </button>
+
+                    {showFormatPopup && (
+                        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+                            <div className="w-[90%] max-w-[400px] rounded-[40px] shadow-[0px_16px_25.2px_7px_#1A55701A] p-10 bg-[#FDFDFD] relative flex flex-col items-center gap-6">
+                                {/* Close Button */}
+                                <div
+                                    className="absolute right-6 top-6 cursor-pointer"
+                                    onClick={() => setShowFormatPopup(false)}
+                                >
+                                    <CloseIcon />
+                                </div>
+
+                                {/* Title */}
+                                <h2 className="font-avenir font-semibold text-[24px] sm:text-[32px] leading-[32px] text-black text-center">
+                                    Choose a format
+                                </h2>
+
+                                {/* Formats */}
+                                <div className="flex items-center justify-center gap-4 sm:gap-6 mt-2">
+                                    {/* PDF */}
+                                    <div
+                                        onClick={() => handleFormatSelect('pdf')}
+                                        className="w-[90px] h-[90px] sm:w-[100px] sm:h-[100px] bg-[#EDF2F8] rounded-[10px] flex justify-center items-center cursor-pointer shadow-[0px_0px_4px_0px_#21527D40_inset] transition-all duration-300 ease-out hover:bg-[#FDFDFD] hover:ring-[0.5px] hover:ring-[#21527D] hover:shadow-[0px_0px_6px_0px_#21527D80_inset] hover:scale-[1.05]"
+                                    >
+                                        <PdfIcon width={40} height={40} color="#21527D" opacity={1} />
+                                    </div>
+
+                                    {/* DOC */}
+                                    <div
+                                        onClick={() => handleFormatSelect('doc')}
+                                        className="w-[90px] h-[90px] sm:w-[100px] sm:h-[100px] bg-[#EDF2F8] rounded-[10px] flex justify-center items-center cursor-pointer shadow-[0px_0px_4px_0px_#21527D40_inset] transition-all duration-300 ease-out hover:bg-[#FDFDFD] hover:ring-[0.5px] hover:ring-[#21527D] hover:shadow-[0px_0px_6px_0px_#21527D80_inset] hover:scale-[1.05]"
+                                    >
+                                        <DocIcon width={40} height={40} color="#21527D" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {showExportPopup && (
                         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">

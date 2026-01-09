@@ -10,22 +10,16 @@ const basePlans = [
     price: "$0",
     period: "/ month",
     buttonText: "Get Started Free",
-    // Default button color (for inactive state)
     defaultButtonBg: "bg-[#E7EDF2]",
     defaultButtonTextColor: "text-[#121212]",
-    // Button color when card is highlighted
     highlightedButtonBg: "bg-white",
     highlightedButtonTextColor: "text-[#21527D]",
-    // Default features section color (for inactive state)
     defaultFeatureBg: "bg-[#E7EDF2]",
-    // Features section color when card is highlighted
     highlightedFeatureBg: "bg-white",
-    // Text colors
     originalPriceColor: "text-[#5B7C99]",
     originalTextColor: "text-[#21527D]",
     originalSubtitleColor: "text-[#121212]",
     link: "/fullname",
-    isLink: true,
     features: [
       "10 pages/day OCR processing",
       "Printed and handwritten text extraction",
@@ -59,7 +53,6 @@ const basePlans = [
       "API access",
       "Email support",
     ],
-    link: "/fullname",
   },
   {
     id: 3,
@@ -85,11 +78,10 @@ const basePlans = [
       "Priority support",
       "Advanced export options",
     ],
-    link: "/fullname",
   },
 ];
 
-// Define the special color for highlighted card
+// Highlight color
 const HIGHLIGHTED_COLOR = {
   cardBg: "bg-[#21527D]",
   textColor: "text-white",
@@ -97,77 +89,68 @@ const HIGHLIGHTED_COLOR = {
   subtitleColor: "text-white",
 };
 
-const PlanCard = ({ plan, isHighlighted, onClick }) => {
-  const ButtonComponent = plan.isLink ? Link : 'button';
-  const buttonProps = plan.isLink
-    ? { to: plan.link }
-    : { type: "button" };
+// CARD COMPONENT (UI SAME)
+const PlanCard = ({ plan, isHighlighted, onSubscribe }) => {
+  const navigate = useNavigate();
 
-  // Determine colors based on whether this card is highlighted
   const cardBg = isHighlighted ? HIGHLIGHTED_COLOR.cardBg : "bg-[#FDFDFD]";
   const textColor = isHighlighted ? HIGHLIGHTED_COLOR.textColor : plan.originalTextColor;
   const subtitleColor = isHighlighted ? HIGHLIGHTED_COLOR.subtitleColor : plan.originalSubtitleColor;
   const priceColor = isHighlighted ? HIGHLIGHTED_COLOR.priceColor : plan.originalPriceColor;
-
-  // Button colors based on highlighted state
   const buttonBg = isHighlighted ? plan.highlightedButtonBg : plan.defaultButtonBg;
   const buttonTextColor = isHighlighted ? plan.highlightedButtonTextColor : plan.defaultButtonTextColor;
-
-  // Features section background based on highlighted state
   const featureBg = isHighlighted ? plan.highlightedFeatureBg : plan.defaultFeatureBg;
-  const navigate = useNavigate();
+
   return (
     <div
       className={`flex-1 min-w-[280px] ${cardBg} rounded-[20px] shadow-[0px_0px_4px_0px_#00000040] p-4 md:p-5 lg:p-6 flex flex-col h-full cursor-pointer transition-colors duration-300`}
-      onClick={onClick}
     >
-      {/* TITLE */}
-      <h2 className={`font-avenir font-semibold lg:font-bold text-[20px] leading-tight mb-3 ${textColor}`}>
+      <h2 className={`font-avenir font-semibold lg:font-bold text-[20px] mb-3 ${textColor}`}>
         {plan.name}
       </h2>
 
-      {/* SUBTITLE */}
-      <p className={`font-avenir font-[600] text-[16px] leading-snug mb-4 ${subtitleColor}`}>
+      <p className={`font-avenir font-[600] text-[16px] mb-4 ${subtitleColor}`}>
         {plan.subtitle}
       </p>
 
-      {/* PRICE */}
       <div className="flex items-end gap-1 mb-4">
-        <span className={`font-avenir font-semibold lg:font-bold text-[32px] leading-none ${priceColor}`}>
+        <span className={`font-avenir font-bold text-[32px] ${priceColor}`}>
           {plan.price}
         </span>
-        <span className={`font-avenir font-semibold lg:font-bold text-[16px] leading-none mb-1 ${priceColor}`}>
+        <span className={`font-avenir font-bold text-[16px] mb-1 ${priceColor}`}>
           {plan.period}
         </span>
       </div>
 
-      {/* BUTTON */}
+      {/* BUTTON – LOGIC ONLY */}
       <div className="mt-auto mb-4">
         <button
-          className={`w-full max-w-[200px] mx-auto h-[50px] flex items-center justify-center hover:opacity-70 transition cursor-pointer
-  font-avenir font-semibold text-[20px] rounded-full ${buttonTextColor} ${buttonBg}`}
+          className={`w-full max-w-[200px] mx-auto h-[50px] flex items-center justify-center hover:opacity-70 transition
+          font-avenir font-semibold text-[20px] rounded-full ${buttonTextColor} ${buttonBg}`}
           onClick={(e) => {
             e.stopPropagation();
-            navigate(plan.link);
+            if (plan.id === 1) {
+              navigate("/fullname");
+            } else {
+              onSubscribe(plan);
+            }
           }}
         >
           {plan.buttonText}
         </button>
 
         {plan.extra && (
-          <p className={`font-avenir font-bold italic text-[12px] text-center mt-2 ${isHighlighted ? "text-white/80" : "text-[#B6B6B6]"
-            }`}>
+          <p className={`font-avenir font-bold italic text-[12px] text-center mt-2 ${isHighlighted ? "text-white/80" : "text-[#B6B6B6]"}`}>
             {plan.extra}
           </p>
         )}
       </div>
 
-      {/* FEATURES SECTION */}
-      <div className={`${featureBg} rounded-[20px] shadow-[0px_0px_4px_0px_#00000040] p-4 md:p-5 flex-1 transition-colors duration-300`}>
+      <div className={`${featureBg} rounded-[20px] shadow p-4 flex-1`}>
         <ul className="space-y-1">
-          {plan.features.map((feature, i) => (
-            <li key={i} className="font-avenir italic text-[14px] md:text-[15px] text-[#6E6E6E] leading-relaxed">
-              • {feature}
+          {plan.features.map((f, i) => (
+            <li key={i} className="font-avenir italic text-[14px] text-[#6E6E6E]">
+              • {f}
             </li>
           ))}
         </ul>
@@ -176,41 +159,76 @@ const PlanCard = ({ plan, isHighlighted, onClick }) => {
   );
 };
 
+// MAIN SCREEN
 const PersonalScreen = () => {
-  // Start with card 2 highlighted by default
   const [highlightedCardId, setHighlightedCardId] = useState(2);
 
+  // ✅ PAYMENT LOGIC - EXACTLY FROM OLD CODE
+  const handlePayment = async (plan) => {
+    const amount = plan.id === 2 ? 29 : 199;
+
+    const res = await fetch("http://localhost:5000/api/auth/payment/create-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount }),
+    });
+
+    const order = await res.json();
+
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: order.amount,
+      currency: "INR",
+      name: "Your Company Name",
+      description: plan.name,
+      order_id: order.id,
+
+      handler: async function (response) {
+        await fetch("/api/auth/payment/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            plan: plan.name,
+            amount,
+            user_id: 1,
+          }),
+        });
+
+        alert("Payment successful 🎉");
+      },
+    };
+
+    new window.Razorpay(options).open();
+  };
+
   const handleCardClick = (cardId) => {
-    // Only update if clicking a different card
     if (cardId !== highlightedCardId) {
       setHighlightedCardId(cardId);
     }
   };
 
   return (
-    <div className="bg-[#FDFDFD] px-4 sm:px-6 md:px-8 lg:px-10 py-8 md:py-10">
-      {/* HEADING */}
-      <div className="mb-8 md:mb-12">
-        <h1 className="font-avenir font-semibold lg:font-bold text-2xl md:text-3xl lg:text-4xl text-[#121212] mb-2">
-          Scale Your Document Processing
-        </h1>
-        <p className="font-avenir italic text-base md:text-lg lg:text-xl text-[#464646]">
-          Select the speed and volume your business needs, or build your own solution.
-        </p>
-      </div>
+    <div className="bg-[#FDFDFD] px-4 py-10">
+      <h1 className="font-avenir font-bold text-3xl mb-2">
+        Scale Your Document Processing
+      </h1>
+      <p className="font-avenir italic text-lg text-[#464646] mb-10">
+        Select the speed and volume your business needs.
+      </p>
 
-      {/* CARDS CONTAINER */}
-      <div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 items-stretch px-0 xl:px-15">
-          {basePlans.map((plan) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:px-10">
+        {basePlans.map((plan) => (
+          <div key={plan.id} onClick={() => handleCardClick(plan.id)}>
             <PlanCard
-              key={plan.id}
               plan={plan}
               isHighlighted={plan.id === highlightedCardId}
-              onClick={() => handleCardClick(plan.id)}
+              onSubscribe={handlePayment}
             />
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );
