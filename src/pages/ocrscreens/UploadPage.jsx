@@ -555,7 +555,7 @@ const UploadPage = () => {
 
         try {
             // ✅ USE THE NGROK URL, NOT localhost
-            const FASTAPI_URL = "https://2084cd7d3f90.ngrok-free.app";
+            const FASTAPI_URL = "https://82d078ca5cf2.ngrok-free.app";
             const endpoint = ocrType === 'invoice' ? 'invoice' : 'raw_ocr';
 
             console.log(`Calling FastAPI: ${FASTAPI_URL}/${endpoint}`);
@@ -672,7 +672,7 @@ const UploadPage = () => {
 
             // Try different URLs
             const possibleUrls = [
-                `https://67f02d4dfa1a.ngrok-free.app`,
+                `https://82d078ca5cf2.ngrok-free.app`,
                 `https://2084cd7d3f90.ngrok-free.app`,
                 'http://localhost:8010',
                 'http://127.0.0.1:8010',

@@ -4,7 +4,40 @@ import { useNavigate } from "react-router-dom";
 
 const InvoiceDoc = ({ onClose }) => {
   const [hoveredCard, setHoveredCard] = useState(null);
+  const MAX_STORAGE_SIZE = 5 * 1024 * 1024; // 5MB
   const activeCard = hoveredCard ?? 2;
+  const compressImageToBase64 = (file, quality = 0.7, maxWidth = 2000) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const img = new Image();
+        img.src = reader.result;
+
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let { width, height } = img;
+
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressedBase64 = canvas.toDataURL("image/jpeg", quality);
+          resolve(compressedBase64);
+        };
+      };
+
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
 
   const fileInputRef = useRef(null);
   const [selectedOCRType, setSelectedOCRType] = useState(null);
@@ -14,6 +47,10 @@ const InvoiceDoc = ({ onClose }) => {
     setSelectedOCRType(ocrType);
     fileInputRef.current?.click();
   };
+  const getBase64Size = (base64) => {
+    const stringLength = base64.length - base64.indexOf(",") - 1;
+    return Math.floor(stringLength * 0.75); // bytes
+  };
 
   // Helper function to convert File to base64
   const fileToBase64 = (file) => {
@@ -21,7 +58,7 @@ const InvoiceDoc = ({ onClose }) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
+      reader.onerror = (error) => reject(error);
     });
   };
 
@@ -38,8 +75,8 @@ const InvoiceDoc = ({ onClose }) => {
       "image/svg+xml",
     ];
 
-    const validFiles = files.filter(file => allowedTypes.includes(file.type));
-    
+    const validFiles = files.filter((file) => allowedTypes.includes(file.type));
+
     if (validFiles.length === 0) {
       alert("Only PDF and image files (jpeg, jpg, png, webp, svg) are allowed");
       e.target.value = "";
@@ -47,38 +84,58 @@ const InvoiceDoc = ({ onClose }) => {
     }
 
     try {
-      // Convert files to base64 and store them
-      const filesWithBase64 = await Promise.all(
-        validFiles.map(async (file) => {
-          const base64 = await fileToBase64(file);
-          return {
-            id: Date.now() + Math.random(),
-            name: file.name,
-            type: file.type,
-            base64: base64,
-            size: file.size,
-            lastModified: file.lastModified,
-            pageCount: file.type === 'application/pdf' ? Math.floor(Math.random() * 20) + 1 : 1
-          };
-        })
+      let totalSize = 0;
+      const filesWithBase64 = [];
+
+      for (const file of validFiles) {
+        let base64;
+
+        if (file.type.startsWith("image/")) {
+          // ✅ compress image
+          base64 = await compressImageToBase64(file);
+        } else {
+          // ✅ PDF → normal base64
+          base64 = await fileToBase64(file);
+        }
+
+        const base64Size = getBase64Size(base64);
+        totalSize += base64Size;
+
+        // ❌ if exceeds 5MB
+        if (totalSize > MAX_STORAGE_SIZE) {
+          alert(
+            "Selected files exceed 5MB browser storage limit.\n\n" +
+              "Please upload smaller PDF/Image files."
+          );
+          e.target.value = "";
+          return;
+        }
+
+        filesWithBase64.push({
+          id: Date.now() + Math.random(),
+          name: file.name,
+          type: file.type,
+          base64,
+          size: file.size,
+          lastModified: file.lastModified,
+          pageCount:
+            file.type === "application/pdf"
+              ? Math.floor(Math.random() * 20) + 1
+              : 1,
+        });
+      }
+
+      // ✅ SAFE TO STORE
+      localStorage.setItem("currentOCRType", selectedOCRType);
+      localStorage.setItem("invoiceDocFiles", JSON.stringify(filesWithBase64));
+      localStorage.setItem(
+        "originalExtractFiles",
+        JSON.stringify(filesWithBase64)
       );
 
-      // Store OCR type and files for UploadPage
-      localStorage.setItem('currentOCRType', selectedOCRType);
-      localStorage.setItem('invoiceDocFiles', JSON.stringify(filesWithBase64));
-      
-      // ✅ ALSO SAVE FOR ORIGINALEXTRACTPAGE
-      localStorage.setItem('originalExtractFiles', JSON.stringify(filesWithBase64));
-      
-      // Reset file input
       e.target.value = "";
-
-      // Close the popup
       onClose();
-      
-      // Navigate to UploadPage
-      navigate('/uploadpage');
-      
+      navigate("/uploadpage");
     } catch (error) {
       console.error("Error processing files:", error);
       alert("Error processing files. Please try again.");
@@ -88,7 +145,6 @@ const InvoiceDoc = ({ onClose }) => {
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/30 px-4">
       <div className="w-full max-w-[700px] bg-white rounded-[30px] shadow-[0px_4px_20px_0px_#00000040] p-6 sm:p-8 md:p-10 relative">
-
         {/* Hidden file input */}
         <input
           ref={fileInputRef}
@@ -117,7 +173,7 @@ const InvoiceDoc = ({ onClose }) => {
           {/* Card 1 - Invoice OCR */}
           <div
             onMouseEnter={() => setHoveredCard(1)}
-            onClick={() => openFileUpload('invoice')}
+            onClick={() => openFileUpload("invoice")}
             className={`
               ${activeCard === 1 ? "bg-[#21527D]" : "bg-[#EDF2F8]"}
               shadow-[inset_0px_0px_4px_0px_#80628E7A]
@@ -125,23 +181,43 @@ const InvoiceDoc = ({ onClose }) => {
               transition-all duration-200 cursor-pointer
             `}
           >
-            <h3 className={`font-avenir font-bold text-[16px] ${activeCard === 1 ? "text-white" : "text-[#21527D]"}`}>
+            <h3
+              className={`font-avenir font-bold text-[16px] ${
+                activeCard === 1 ? "text-white" : "text-[#21527D]"
+              }`}
+            >
               Invoice OCR
             </h3>
 
-            <p className={`font-avenir font-semibold px-8 text-[12px] ${activeCard === 1 ? "text-white" : "text-[#121212]"}`}>
+            <p
+              className={`font-avenir font-semibold px-8 text-[12px] ${
+                activeCard === 1 ? "text-white" : "text-[#121212]"
+              }`}
+            >
               Extract structured invoice data with high accuracy.
             </p>
 
-            <p className={`font-avenir font-semibold text-[10px] ${activeCard === 1 ? "text-white" : "text-[#121212]"}`}>
+            <p
+              className={`font-avenir font-semibold text-[10px] ${
+                activeCard === 1 ? "text-white" : "text-[#121212]"
+              }`}
+            >
               Auto detect fields and export to Excel
             </p>
 
             <div className="mt-3">
-              <p className={`font-avenir font-bold text-[10px] ${activeCard === 1 ? "text-white" : "text-[#121212]"}`}>
+              <p
+                className={`font-avenir font-bold text-[10px] ${
+                  activeCard === 1 ? "text-white" : "text-[#121212]"
+                }`}
+              >
                 Input formats
               </p>
-              <p className={`font-avenir italic text-[10px] ${activeCard === 1 ? "text-white" : "text-[#21527D]"}`}>
+              <p
+                className={`font-avenir italic text-[10px] ${
+                  activeCard === 1 ? "text-white" : "text-[#21527D]"
+                }`}
+              >
                 PDF · Image
               </p>
             </div>
@@ -150,7 +226,7 @@ const InvoiceDoc = ({ onClose }) => {
           {/* Card 2 - Document OCR */}
           <div
             onMouseEnter={() => setHoveredCard(2)}
-            onClick={() => openFileUpload('document')}
+            onClick={() => openFileUpload("document")}
             className={`
               ${activeCard === 2 ? "bg-[#21527D]" : "bg-[#EDF2F8]"}
               shadow-[inset_0px_0px_4px_0px_#80628E7A]
@@ -158,23 +234,43 @@ const InvoiceDoc = ({ onClose }) => {
               transition-all duration-200 cursor-pointer
             `}
           >
-            <h3 className={`font-avenir font-bold text-[16px] ${activeCard === 2 ? "text-white" : "text-[#21527D]"}`}>
+            <h3
+              className={`font-avenir font-bold text-[16px] ${
+                activeCard === 2 ? "text-white" : "text-[#21527D]"
+              }`}
+            >
               Document OCR
             </h3>
 
-            <p className={`font-avenir font-semibold px-8 text-[12px] ${activeCard === 2 ? "text-white" : "text-[#121212]"}`}>
+            <p
+              className={`font-avenir font-semibold px-8 text-[12px] ${
+                activeCard === 2 ? "text-white" : "text-[#121212]"
+              }`}
+            >
               Convert documents into clean, searchable text.
             </p>
 
-            <p className={`font-avenir font-semibold text-[10px] ${activeCard === 2 ? "text-white" : "text-[#121212]"}`}>
+            <p
+              className={`font-avenir font-semibold text-[10px] ${
+                activeCard === 2 ? "text-white" : "text-[#121212]"
+              }`}
+            >
               Works with printed and handwritten content.
             </p>
 
             <div className="mt-3">
-              <p className={`font-avenir font-bold text-[10px] ${activeCard === 2 ? "text-white" : "text-[#121212]"}`}>
+              <p
+                className={`font-avenir font-bold text-[10px] ${
+                  activeCard === 2 ? "text-white" : "text-[#121212]"
+                }`}
+              >
                 Input formats
               </p>
-              <p className={`font-avenir italic text-[10px] ${activeCard === 2 ? "text-white" : "text-[#21527D]"}`}>
+              <p
+                className={`font-avenir italic text-[10px] ${
+                  activeCard === 2 ? "text-white" : "text-[#21527D]"
+                }`}
+              >
                 PDF · Image
               </p>
             </div>
