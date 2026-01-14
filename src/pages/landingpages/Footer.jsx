@@ -1,5 +1,6 @@
 import React from "react";
 import icon from "../../assets/images/icon.webp";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -55,18 +56,23 @@ const Footer = () => {
             </h3>
             <ul className="space-y-1 md:space-y-2">
               {[
-                "OCR Engine",
-                "Handwritten Text Extraction",
-                "Invoice → Excel",
-                "API & Integrations",
-                "Pricing",
+                { label: "OCR Engine", to: "/ocrengine" },
+                {
+                  label: "Handwritten Text Extraction",
+                  to: "/handwrittentext",
+                },
+                { label: "Invoice → Excel", to: "/invoicetoexcel" },
+                { label: "API & Integrations", to: "/apiintegration" },
+                { label: "Pricing", to: "/pricing" },
               ].map((item, i) => (
-                <li
-                  key={i}
-                  className="font-avenir font-semibold text-[14px]
-                  leading-[32px] text-[#464646]"
-                >
-                  {item}
+                <li key={i}>
+                  <Link
+                    to={item.to}
+                    className="font-avenir font-semibold text-[14px]
+        leading-[32px] text-[#464646] hover:text-[#21527D]"
+                  >
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -79,18 +85,20 @@ const Footer = () => {
             </h3>
             <ul className="space-y-2">
               {[
-                "Logistics & Shipping",
-                "Finance & Accounting",
-                "Healthcare Records",
-                "Government & Compliance",
-                "Custom AI Workflows",
+                { label: "Logistics & Shipping", to: "/logistics" },
+                { label: "Finance & Accounting", to: "/finance" },
+                { label: "Healthcare Records", to: "/healthcare" },
+                { label: "Government & Compliance", to: "/government" },
+                { label: "Custom AI Workflows", to: "/customai" },
               ].map((item, i) => (
-                <li
-                  key={i}
-                  className="font-avenir font-semibold text-[14px]
-                  leading-[32px] text-[#464646]"
-                >
-                  {item}
+                <li key={i}>
+                  <Link
+                    to={item.to}
+                    className="font-avenir font-semibold text-[14px]
+        leading-[32px] text-[#464646] hover:text-[#21527D]"
+                  >
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -103,18 +111,30 @@ const Footer = () => {
             </h3>
             <ul className="space-y-2">
               {[
-                "About Vibexio",
-                "Careers",
-                "Contact",
-                "Privacy Policy",
-                "Terms of Service",
+                { label: "About Vibexio", to: "https://www.vibexio.ai/" },
+                { label: "Privacy Policy", to: "/privacypolicy" },
+                { label: "Terms of Service", to: "/termsservice" },
               ].map((item, i) => (
-                <li
-                  key={i}
-                  className="font-avenir font-semibold text-[14px]
-                  leading-[32px] text-[#464646]"
-                >
-                  {item}
+                <li key={i}>
+                  {item.to.startsWith("http") ? (
+                    <a
+                      href={item.to}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-avenir font-semibold text-[14px]
+          leading-[32px] text-[#464646] hover:text-[#21527D]"
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    <Link
+                      to={item.to}
+                      className="font-avenir font-semibold text-[14px]
+          leading-[32px] text-[#464646] hover:text-[#21527D]"
+                    >
+                      {item.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -127,17 +147,19 @@ const Footer = () => {
             </h3>
             <ul className="space-y-2">
               {[
-                "Security & Compliance",
-                "SLA & Support",
-                "Custom Deployment",
-                "Contact Sales",
+                { label: "Security & Compliance", to: "/securitycompliance" },
+                { label: "SLA & Support", to: "/slasupport" },
+                { label: "Custom Deployment", to: "/customdeployment" },
+                { label: "Contact Sales", to: "/contactsales" },
               ].map((item, i) => (
-                <li
-                  key={i}
-                  className="font-avenir font-semibold text-[14px]
-                  leading-[32px] text-[#464646]"
-                >
-                  {item}
+                <li key={i}>
+                  <Link
+                    to={item.to}
+                    className="font-avenir font-semibold text-[14px]
+        leading-[32px] text-[#464646] hover:text-[#21527D]"
+                  >
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -146,11 +168,13 @@ const Footer = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div className="mt-10 pt-6 border-t border-[#21527D]
-        flex flex-col lg:flex-row gap-3 lg:gap-0 justify-between items-center text-center lg:text-left">
-
+      <div
+        className="mt-10 pt-6 border-t border-[#21527D]
+        flex flex-col lg:flex-row gap-3 lg:gap-0 justify-between items-center text-center lg:text-left"
+      >
         <div className="font-avenir font-semibold text-[14px] text-[#464646]">
-          © 2025 <span className="font-bold text-[#21527D]"> Clario.</span> A Product of{" "}
+          © 2025 <span className="font-bold text-[#21527D]"> Clario.</span> A
+          Product of{" "}
           <span className="font-bold text-[#21527D]">Vibexio.ai</span>
         </div>
 

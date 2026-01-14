@@ -9,31 +9,29 @@ import Logout from "../ocrpopups/Logout";
 
 const NAV_ITEMS = {
     Product: [
-        { label: "OCR Engine", to: "/ocr-engine" },
-        { label: "Handwritten Text Extraction", to: "/handwritten-ocr" },
-        { label: "Invoice → Excel", to: "/invoice-to-excel" },
-        { label: "API & Integrations", to: "/api-integrations" },
-        { label: "Pricing", to: "/pricingpage" },
+        { label: "OCR Engine", to: "/ocrengine" },
+        { label: "Handwritten Text Extraction", to: "/handwrittentext" },
+        { label: "Invoice → Excel", to: "/invoicetoexcel" },
+        { label: "API & Integrations", to: "/apiintegration" },
+        { label: "Pricing", to: "/pricing" },
     ],
     Solutions: [
-        { label: "Logistics & Shipping", to: "/solutions/logistics" },
-        { label: "Finance & Accounting", to: "/solutions/finance" },
-        { label: "Healthcare Records", to: "/solutions/healthcare" },
-        { label: "Government & Compliance", to: "/solutions/government" },
-        { label: "Custom AI Workflows", to: "/solutions/custom-ai" },
+        { label: "Logistics & Shipping", to: "/Logistics" },
+        { label: "Finance & Accounting", to: "/finance" },
+        { label: "Healthcare Records", to: "/healthcare" },
+        { label: "Government & Compliance", to: "/government" },
+        { label: "Custom AI Workflows", to: "/customai" },
     ],
     Company: [
         { label: "About Vibexio", to: "https://www.vibexio.ai/" },
-        { label: "Careers", to: "/careers" },
-        { label: "Contact", to: "/contact" },
-        { label: "Privacy Policy", to: "/privacy-policy" },
-        { label: "Terms of Service", to: "/terms" },
+        { label: "Privacy Policy", to: "/privacypolicy" },
+        { label: "Terms of Service", to: "/termsservice" },
     ],
     Enterprise: [
-        { label: "Security & Compliance", to: "/enterprise/security" },
-        { label: "SLA & Support", to: "/enterprise/sla-support" },
-        { label: "Custom Deployment", to: "/enterprise/custom-deployment" },
-        { label: "Contact Sales", to: "/enterprise/contact-sales" },
+        { label: "Security & Compliance", to: "/securitycompliance" },
+        { label: "SLA & Support", to: "/slasupport" },
+        { label: "Custom Deployment", to: "/customdeployment" },
+        { label: "Contact Sales", to: "/contactsales" },
 
     ],
 };

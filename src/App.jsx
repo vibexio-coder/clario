@@ -34,6 +34,23 @@ import Subscription from "./pages/accountpages/Subscription";
 import BillingInvoices from "./pages/accountpages/BillingInvoices";
 import NewPassword from "./pages/signinsplitscreens/NewPassword";
 import FileTesting from "./pages/demolandingpages/FileTesting.Jsx";
+import OcrEngine from "./pages/navigationpages/OcrEngine";
+import HandwrittenText from "./pages/navigationpages/HandwrittenText";
+import InvoiceToExcel from "./pages/navigationpages/InvoiceToExcel";
+import ApiIntegration from "./pages/navigationpages/ApiIntegration";
+import Pricing from "./pages/navigationpages/Pricing";
+import Logistic from "./pages/navigationpages/Logistic";
+import Finance from "./pages/navigationpages/Finance";
+import Healthcare from "./pages/navigationpages/Healthcare";
+import Government from "./pages/navigationpages/Government";
+import Customai from "./pages/navigationpages/Customai";
+import PrivacyPolicy from "./pages/navigationpages/PrivacyPolicy";
+import TermsService from "./pages/navigationpages/TermsService";
+import SecurityCompliance from "./pages/navigationpages/SecurityCompliance";
+import SlaSupport from "./pages/navigationpages/SlaSupport";
+import CustomDeployment from "./pages/navigationpages/CustomDeployment";
+import ContactSales from "./pages/navigationpages/ContactSales";
+import Api from "./pages/navigationpages/Api";
 
 const App = () => {
   return (
@@ -76,6 +93,23 @@ const App = () => {
         <Route path="/subscription" element={<Subscription />} />
         <Route path="/billinginvoices" element={<BillingInvoices />} />
         <Route path="/filetesting" element={<FileTesting />} />
+        <Route path="/ocrengine" element={<OcrEngine />} />
+        <Route path="/handwrittentext" element={<HandwrittenText />} />
+        <Route path="/invoicetoexcel" element={<InvoiceToExcel />} />
+        <Route path="/apiintegration" element={<ApiIntegration />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/Logistics" element={<Logistic />} />
+        <Route path="/finance" element={<Finance />} />
+        <Route path="/healthcare" element={<Healthcare />} />
+        <Route path="/government" element={<Government />} />
+        <Route path="/customai" element={<Customai />} />
+        <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+        <Route path="/termsservice" element={<TermsService />} />
+        <Route path="/securitycompliance" element={<SecurityCompliance />} />
+        <Route path="/slasupport" element={<SlaSupport />} />
+        <Route path="/customdeployment" element={<CustomDeployment />} />
+        <Route path="/contactsales" element={<ContactSales />} />
+        <Route path="/Api" element={<Api />} />
       </Routes>
     </div>
   );

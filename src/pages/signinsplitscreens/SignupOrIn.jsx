@@ -152,14 +152,23 @@ const SignupOrIn = () => {
       <div className="flex justify-center gap-4">
         <button
           onClick={googleLogin}
-          className="w-[50px] h-[50px] bg-[#FDFDFD] shadow rounded-full flex items-center justify-center"
+          className="w-[50px] h-[50px] bg-[#FDFDFD] shadow rounded-full flex items-center justify-center cursor-pointer"
         >
           <GoogleIcon />
         </button>
 
-        <button className="w-[50px] h-[50px] bg-[#FDFDFD] shadow rounded-full flex items-center justify-center">
-          <MailIcon />
-        </button>
+        <div className="relative group">
+          <button
+            onClick={() => setError("Microsoft sign-in is coming soon")}
+            className="w-[50px] h-[50px] bg-[#FDFDFD] shadow rounded-full flex items-center justify-center cursor-pointer"
+          >
+            <MailIcon />
+          </button>
+
+          <div className="whitespace-nowrap  absolute bottom-[-30px] left-1/2 -translate-x-1/2 bg-black text-white text-[12px] px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition">
+            Coming soon 🚀
+          </div>
+        </div>
       </div>
 
       <p className="text-center font-avenir text-[16px] text-[#121212]">

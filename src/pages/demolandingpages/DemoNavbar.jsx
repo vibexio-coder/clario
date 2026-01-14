@@ -8,32 +8,29 @@ import RotateArrowIcon from "../../assets/icons/accountpage/RotateArrowIcon";
 
 const NAV_ITEMS = {
   Product: [
-    { label: "OCR Engine", to: "/ocr-engine" },
-    { label: "Handwritten Text Extraction", to: "/handwritten-ocr" },
-    { label: "Invoice → Excel", to: "/invoice-to-excel" },
-    { label: "API & Integrations", to: "/api-integrations" },
-    { label: "Pricing", to: "/pricingpage" },
+    { label: "OCR Engine", to: "/ocrengine" },
+    { label: "Handwritten Text Extraction", to: "/handwrittentext" },
+    { label: "Invoice → Excel", to: "/invoicetoexcel" },
+    { label: "API & Integrations", to: "/apiintegration" },
+    { label: "Pricing", to: "/pricing" },
   ],
   Solutions: [
-    { label: "Logistics & Shipping", to: "/solutions/logistics" },
-    { label: "Finance & Accounting", to: "/solutions/finance" },
-    { label: "Healthcare Records", to: "/solutions/healthcare" },
-    { label: "Government & Compliance", to: "/solutions/government" },
-    { label: "Custom AI Workflows", to: "/solutions/custom-ai" },
+    { label: "Logistics & Shipping", to: "/Logistics" },
+    { label: "Finance & Accounting", to: "/finance" },
+    { label: "Healthcare Records", to: "/healthcare" },
+    { label: "Government & Compliance", to: "/government" },
+    { label: "Custom AI Workflows", to: "/customai" },
   ],
   Company: [
     { label: "About Vibexio", to: "https://www.vibexio.ai/" },
-    { label: "Careers", to: "/careers" },
-    { label: "Contact", to: "/contact" },
-    { label: "Privacy Policy", to: "/privacy-policy" },
-    { label: "Terms of Service", to: "/terms" },
+    { label: "Privacy Policy", to: "/privacypolicy" },
+    { label: "Terms of Service", to: "/termsservice" },
   ],
   Enterprise: [
-    { label: "Security & Compliance", to: "/enterprise/security" },
-    { label: "SLA & Support", to: "/enterprise/sla-support" },
-    { label: "Custom Deployment", to: "/enterprise/custom-deployment" },
-    { label: "Contact Sales", to: "/enterprise/contact-sales" },
-
+    { label: "Security & Compliance", to: "/securitycompliance" },
+    { label: "SLA & Support", to: "/slasupport" },
+    { label: "Custom Deployment", to: "/customdeployment" },
+    { label: "Contact Sales", to: "/contactsales" },
   ],
 };
 
@@ -127,7 +124,6 @@ const DemoNavbar = () => {
       <div className="w-full px-4 sm:px-6 lg:px-12">
         {/* Main navigation container */}
         <div className="flex items-center justify-between h-16 lg:h-20">
-
           {/* Logo */}
           <div className="shrink-0">
             <Link to="/" onClick={closeMobileMenu}>
@@ -156,16 +152,19 @@ const DemoNavbar = () => {
                     <DownArrowIcon
                       width={18}
                       height={18}
-                      className={`transition-transform duration-200 ${activeDropdown === title ? "rotate-180" : ""
-                        }`}
+                      className={`transition-transform duration-200 ${
+                        activeDropdown === title ? "rotate-180" : ""
+                      }`}
                     />
                   </button>
 
                   {/* Desktop Dropdown */}
                   {activeDropdown === title && (
                     <div className="absolute left-1/2 transform -translate-x-1/2 top-full pt-1 z-50">
-                      <div className="bg-[#E7EDF2] border border-[#BCD6EB] rounded-[10px] 
-                        shadow-[0px_0px_5px_0px_#00000040] min-w-[260px] py-1">
+                      <div
+                        className="bg-[#E7EDF2] border border-[#BCD6EB] rounded-[10px] 
+                        shadow-[0px_0px_5px_0px_#00000040] min-w-[260px] py-1"
+                      >
                         {NAV_ITEMS[title].map((item, index) => (
                           <Link
                             key={index}
@@ -210,7 +209,6 @@ const DemoNavbar = () => {
             </Link>
           </div>
 
-
           {/* Mobile menu button */}
           <div className="lg:hidden">
             <button
@@ -232,7 +230,7 @@ const DemoNavbar = () => {
       </div>
 
       {/* Mobile menu */}
-      <div className={`lg:hidden ${mobileOpen ? 'block' : 'hidden'}`}>
+      <div className={`lg:hidden ${mobileOpen ? "block" : "hidden"}`}>
         <div className="px-4 pt-2 pb-4 space-y-1 border-t border-gray-200 bg-white">
           {Object.keys(NAV_ITEMS).map((title) => (
             <div key={title} className="mb-2">
@@ -246,8 +244,9 @@ const DemoNavbar = () => {
                 <DownArrowIcon
                   width={18}
                   height={18}
-                  className={`transition-transform duration-200 ${mobileExpanded === title ? "rotate-180" : ""
-                    }`}
+                  className={`transition-transform duration-200 ${
+                    mobileExpanded === title ? "rotate-180" : ""
+                  }`}
                 />
               </button>
 
@@ -292,7 +291,7 @@ const DemoNavbar = () => {
           </div>
         </div>
       </div>
-    </nav >
+    </nav>
   );
 };
 
