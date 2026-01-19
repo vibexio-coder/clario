@@ -218,7 +218,14 @@ const UploadPage = () => {
       // Get OCR type
       if (currentOCRType) {
         setOcrType(currentOCRType);
+        localStorage.setItem("uploadPageOCRType", currentOCRType);
         localStorage.removeItem("currentOCRType");
+      } else {
+        // Fallback to persisted OCR type if not coming freshly from InvoiceDoc
+        const persistedOCRType = localStorage.getItem("uploadPageOCRType");
+        if (persistedOCRType) {
+          setOcrType(persistedOCRType);
+        }
       }
     };
 
@@ -229,6 +236,13 @@ const UploadPage = () => {
   useEffect(() => {
     saveToSyncStorage(uploadedFiles);
   }, [uploadedFiles]);
+
+  // ✅ Persist OCR type whenever it changes
+  useEffect(() => {
+    if (ocrType) {
+      localStorage.setItem("uploadPageOCRType", ocrType);
+    }
+  }, [ocrType]);
 
   // Handle Add Files button click
   const handleAddFiles = () => {
@@ -569,7 +583,7 @@ const UploadPage = () => {
 
     try {
       // ✅ USE THE NGROK URL, NOT localhost
-      const FASTAPI_URL = "https://38ffee5e3dd7.ngrok-free.app";
+      const FASTAPI_URL = "https://b0cf04c66cc7.ngrok-free.app";
       const endpoint = ocrType === "invoice" ? "invoice" : "raw_ocr";
 
       console.log(`Calling FastAPI: ${FASTAPI_URL}/${endpoint}`);
@@ -625,10 +639,10 @@ const UploadPage = () => {
       ) {
         alert(
           `⚠️ Cannot connect to FastAPI server.\n\n` +
-            `Please check:\n` +
-            `1. The ngrok URL: https://67f02d4dfa1a.ngrok-free.app\n` +
-            `2. Ask your AI developer if server is running\n` +
-            `3. Try again in a few moments`
+          `Please check:\n` +
+          `1. The ngrok URL: https://67f02d4dfa1a.ngrok-free.app\n` +
+          `2. Ask your AI developer if server is running\n` +
+          `3. Try again in a few moments`
         );
       } else {
         alert(`Error processing files: ${error.message}`);
@@ -691,9 +705,7 @@ const UploadPage = () => {
 
       // Try different URLs
       const possibleUrls = [
-        "https://38ffee5e3dd7.ngrok-free.app",
-        `https://8a6df2dcad7f.ngrok-free.app`,
-        `https://67f02d4dfa1a.ngrok-free.app`,
+        "https://b0cf04c66cc7.ngrok-free.app",
         "http://localhost:8010",
         "http://127.0.0.1:8010",
         "http://0.0.0.0:8010",
@@ -973,13 +985,11 @@ const UploadPage = () => {
                 <button
                   onClick={handleZoomOut}
                   disabled={!currentPreviewFile}
-                  className={`hover:opacity-80 ${
-                    zoomLevel <= 20
-                      ? "opacity-50 cursor-not-allowed"
-                      : "opacity-100 cursor-pointer"
-                  } ${
-                    !currentPreviewFile ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
+                  className={`hover:opacity-80 ${zoomLevel <= 20
+                    ? "opacity-50 cursor-not-allowed"
+                    : "opacity-100 cursor-pointer"
+                    } ${!currentPreviewFile ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                 >
                   <SearchMinusIcon />
                 </button>
@@ -989,13 +999,11 @@ const UploadPage = () => {
                 <button
                   onClick={handleZoomIn}
                   disabled={!currentPreviewFile}
-                  className={`hover:opacity-80 ${
-                    zoomLevel >= 200
-                      ? "opacity-50 cursor-not-allowed"
-                      : "opacity-100 cursor-pointer"
-                  } ${
-                    !currentPreviewFile ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
+                  className={`hover:opacity-80 ${zoomLevel >= 200
+                    ? "opacity-50 cursor-not-allowed"
+                    : "opacity-100 cursor-pointer"
+                    } ${!currentPreviewFile ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                 >
                   <SearchAddIcon />
                 </button>
@@ -1050,32 +1058,28 @@ const UploadPage = () => {
                     !currentPreviewFile ||
                     !currentPreviewFile.file.type.startsWith("image/")
                   }
-                  className={`hover:opacity-80 ${
-                    isCropping ? "opacity-100" : "opacity-70"
-                  } ${
-                    !currentPreviewFile ||
-                    !currentPreviewFile.file.type.startsWith("image/")
+                  className={`hover:opacity-80 ${isCropping ? "opacity-100" : "opacity-70"
+                    } ${!currentPreviewFile ||
+                      !currentPreviewFile.file.type.startsWith("image/")
                       ? "opacity-50 cursor-not-allowed"
                       : ""
-                  }`}
+                    }`}
                 >
                   <TextIcon width={24} height={24} color="#000000" />
                 </button>
                 <button
                   onClick={handleRotate}
                   disabled={!currentPreviewFile}
-                  className={`hover:opacity-80 ${
-                    !currentPreviewFile ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
+                  className={`hover:opacity-80 ${!currentPreviewFile ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                 >
                   <RefreshRotateIcon />
                 </button>
                 <button
                   onClick={handleDelete}
                   disabled={!currentPreviewFile}
-                  className={`hover:opacity-80 ${
-                    !currentPreviewFile ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
+                  className={`hover:opacity-80 ${!currentPreviewFile ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                 >
                   <TrashIcon width={24} height={24} color="#000000" />
                 </button>
@@ -1087,22 +1091,20 @@ const UploadPage = () => {
               <button
                 onClick={() => handleExtractAction(false)}
                 disabled={!currentPreviewFile || isProcessing}
-                className={`font-avenir font-semibold lg:font-bold text-[16px] leading-[100%] text-[#21527D] bg-[#E7EDF2] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-[260px] h-[55px] rounded-[15px] flex items-center justify-center cursor-pointer ${
-                  !currentPreviewFile || isProcessing
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:opacity-90"
-                }`}
+                className={`font-avenir font-semibold lg:font-bold text-[16px] leading-[100%] text-[#21527D] bg-[#E7EDF2] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-[260px] h-[55px] rounded-[15px] flex items-center justify-center cursor-pointer ${!currentPreviewFile || isProcessing
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:opacity-90"
+                  }`}
               >
                 {isProcessing ? "Processing..." : "Extract This File"}
               </button>
               <button
                 onClick={() => handleExtractAction(true)}
                 disabled={uploadedFiles.length === 0 || isProcessing}
-                className={`font-avenir font-semibold lg:font-bold text-[16px] leading-[100%] text-[#FDFDFD] bg-[#21527D] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-[250px] h-[55px] rounded-[15px] flex items-center justify-center cursor-pointer ${
-                  uploadedFiles.length === 0 || isProcessing
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:opacity-90"
-                }`}
+                className={`font-avenir font-semibold lg:font-bold text-[16px] leading-[100%] text-[#FDFDFD] bg-[#21527D] shadow-[0px_1px_4px_0px_#00000040] w-full sm:w-[250px] h-[55px] rounded-[15px] flex items-center justify-center cursor-pointer ${uploadedFiles.length === 0 || isProcessing
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:opacity-90"
+                  }`}
               >
                 {isProcessing ? "Processing All..." : "Extract All"}
               </button>
@@ -1129,7 +1131,7 @@ const UploadPage = () => {
               fileCount={
                 uploadedFiles.length > 0
                   ? localStorage.getItem("processingFileCount") ||
-                    (currentPreviewFile ? 1 : uploadedFiles.length)
+                  (currentPreviewFile ? 1 : uploadedFiles.length)
                   : 0
               }
             />

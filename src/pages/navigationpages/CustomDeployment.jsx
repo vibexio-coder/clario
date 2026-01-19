@@ -5,7 +5,7 @@ const CustomDeployment = () => {
   return (
     <div>
       <Navbar />
-      <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-12">
         <div className="text-center max-w-xl">
           {/* Icon */}
           <div className="flex justify-center mb-6">

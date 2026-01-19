@@ -1,13 +1,13 @@
 import React from 'react';
-import DemoNavbar from '../demolandingpages/DemoNavbar';
 import DemoLanding from '../demolandingpages/DemoLanding';
 import OcrWorksSection from '../landingpages/OcrWorksSection';
 import Footer from '../landingpages/Footer';
+import Navbar from '../landingpages/Navbar';
 
 const DemoLandingScreen = () => {
     return (
         <div>
-            <DemoNavbar />
+            <Navbar />
             <DemoLanding />
             <div className='w-full px-4 sm:px-6 lg:px-12 py-10'>
                 <OcrWorksSection />

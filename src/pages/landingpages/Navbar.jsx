@@ -56,11 +56,18 @@ const Navbar = () => {
     const [mobileExpanded, setMobileExpanded] = useState(null);
     const [userOpen, setUserOpen] = useState(false);
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
 
     const dropdownRef = useRef(null);
     const userDropdownRef = useRef(null);
     const userButtonRef = useRef(null);
+
+    // Initial check for login state
+    useEffect(() => {
+        const userId = localStorage.getItem("userId");
+        setIsLoggedIn(!!userId);
+    }, []);
 
     // Close dropdowns when clicking outside
     useEffect(() => {
@@ -120,9 +127,17 @@ const Navbar = () => {
 
     const handleLogoutConfirm = () => {
         setShowLogoutPopup(false);
-        // Add your logout logic here
+
+        // Remove auth items
+        localStorage.removeItem("userId");
+        localStorage.removeItem("email");
+        localStorage.removeItem("loginType");
+        localStorage.removeItem("loginValue");
+
+        setIsLoggedIn(false);
         navigate("/");
     };
+
     const handleLogoutCancel = () => {
         setShowLogoutPopup(false);
     };
@@ -152,7 +167,7 @@ const Navbar = () => {
 
                     {/* Logo */}
                     <div className="flex-shrink-0">
-                        <Link to="/landingpage" onClick={closeMobileMenu}>
+                        <Link to={isLoggedIn ? "/landingpage" : "/"} onClick={closeMobileMenu}>
                             <img src={icon} alt="Clario" className="h-10 w-auto lg:h-12" />
                         </Link>
                     </div>
@@ -220,76 +235,87 @@ const Navbar = () => {
                         </div>
                     </div>
 
-                    {/* User Menu - Desktop */}
-                    <div
-                        className="hidden lg:block relative"
-                        onMouseEnter={handleUserEnter}
-                        onMouseLeave={handleUserLeave}
-                    >
-                        <button
-                            ref={userButtonRef}
-                            onClick={() => setUserOpen(!userOpen)}
-                            className="flex items-center w-[150px] justify-center"
-                            aria-label="User menu"
+                    {/* User Menu OR Sign In Button - Desktop */}
+                    {isLoggedIn ? (
+                        <div
+                            className="hidden lg:block relative"
+                            onMouseEnter={handleUserEnter}
+                            onMouseLeave={handleUserLeave}
                         >
-                            <UserIcon className="w-12 h-12 text-[#21527D]" />
-                        </button>
+                            <button
+                                ref={userButtonRef}
+                                onClick={() => setUserOpen(!userOpen)}
+                                className="flex items-center w-[150px] justify-center"
+                                aria-label="User menu"
+                            >
+                                <UserIcon className="w-12 h-12 text-[#21527D]" />
+                            </button>
 
-                        {userOpen && (
-                            <div className="absolute left-1/2 transform -translate-x-1/2 top-full pt-1 z-50 overflow-scroll scrollbar-hide">
-                                <div className="bg-[#E7EDF2] border border-[#BCD6EB] rounded-[10px]
-      shadow-[0px_0px_5px_0px_#00000040] min-w-[220px] py-1">
+                            {userOpen && (
+                                <div className="absolute left-1/2 transform -translate-x-1/2 top-full pt-1 z-50 overflow-scroll scrollbar-hide">
+                                    <div className="bg-[#E7EDF2] border border-[#BCD6EB] rounded-[10px]
+          shadow-[0px_0px_5px_0px_#00000040] min-w-[220px] py-1">
 
-                                    {USER_MENU.map((item, index) => {
-                                        const isAccount = item.label.trim() === "Account";
+                                        {USER_MENU.map((item, index) => {
+                                            const isAccount = item.label.trim() === "Account";
 
-                                        return (
-                                            <div
-                                                key={index}
-                                                className="border-b border-[#BCD6EB] last:border-b-0"
-                                            >
-                                                {/* 🔹 ACCOUNT (NO ROUTE) */}
-                                                {isAccount ? (
-                                                    <div
-                                                        className="px-6 py-3.5 text-center
-                font-avenir font-[750] text-[16px]
-                leading-[100%] tracking-[0.03em]
-                text-[#21527D]"
-                                                    >
-                                                        {item.label}
-                                                    </div>
-                                                ) : item.action === "logout" ? (
-                                                    /* 🔹 LOGOUT (STYLE UNCHANGED) */
-                                                    <button
-                                                        onClick={() => handleLogoutClick(false)}
-                                                        className="flex items-center w-full px-6 py-3.5
-                                                    font-avenir font-semibold text-[16px]
-                                                    leading-[24px] text-[#464646]
-                                                    hover:bg-[#DEE6ED] transition-colors gap-3"
-                                                    >
-                                                        {item.Icon && <item.Icon width={30} height={30} />}
-                                                        <span>{item.label}</span>
-                                                    </button>
-                                                ) : (
-                                                    /* 🔹 NORMAL LINKS */
-                                                    <Link
-                                                        to={item.to}
-                                                        onClick={() => setUserOpen(false)}
-                                                        className="block px-6 py-3.5
-                font-avenir font-semibold text-[16px]
-                leading-6 text-[#464646]
-                hover:bg-[#DEE6ED] transition-colors"
-                                                    >
-                                                        {item.label}
-                                                    </Link>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
+                                            return (
+                                                <div
+                                                    key={index}
+                                                    className="border-b border-[#BCD6EB] last:border-b-0"
+                                                >
+                                                    {/* 🔹 ACCOUNT (NO ROUTE) */}
+                                                    {isAccount ? (
+                                                        <div
+                                                            className="px-6 py-3.5 text-center
+                    font-avenir font-[750] text-[16px]
+                    leading-[100%] tracking-[0.03em]
+                    text-[#21527D]"
+                                                        >
+                                                            {item.label}
+                                                        </div>
+                                                    ) : item.action === "logout" ? (
+                                                        /* 🔹 LOGOUT (STYLE UNCHANGED) */
+                                                        <button
+                                                            onClick={() => handleLogoutClick(false)}
+                                                            className="flex items-center w-full px-6 py-3.5
+                                                        font-avenir font-semibold text-[16px]
+                                                        leading-[24px] text-[#464646]
+                                                        hover:bg-[#DEE6ED] transition-colors gap-3"
+                                                        >
+                                                            {item.Icon && <item.Icon width={30} height={30} />}
+                                                            <span>{item.label}</span>
+                                                        </button>
+                                                    ) : (
+                                                        /* 🔹 NORMAL LINKS */
+                                                        <Link
+                                                            to={item.to}
+                                                            onClick={() => setUserOpen(false)}
+                                                            className="block px-6 py-3.5
+                    font-avenir font-semibold text-[16px]
+                    leading-6 text-[#464646]
+                    hover:bg-[#DEE6ED] transition-colors"
+                                                        >
+                                                            {item.label}
+                                                        </Link>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="hidden lg:flex items-center w-[150px] justify-center">
+                            <Link
+                                to="/signin"
+                                className="font-avenir font-semibold text-[16px] xl:text-[18px] text-white border border-[#21527D] px-2.5 lg:px-10 py-2 rounded-[10px] bg-[#21527D] hover:opacity-90 transition cursor-pointer"
+                            >
+                                Sign In
+                            </Link>
+                        </div>
+                    )}
 
                     {/* Mobile menu button */}
                     <div className="lg:hidden">
@@ -361,56 +387,67 @@ const Navbar = () => {
                         API
                     </Link>
 
-                    {/* User Menu - Mobile - Now as a dropdown */}
-                    <div className="mt-4 pt-4 border-t border-gray-200">
-                        <button
-                            onClick={() => setMobileExpanded(mobileExpanded === 'account' ? null : 'account')}
-                            className="flex items-center justify-between w-full px-4 py-3 
-      font-avenir font-semibold text-[17px] text-[#21527D] 
-      bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors mb-2"
-                        >
-                            <span className="uppercase tracking-wider">Account</span>
-                            <DownArrowIcon
-                                width={18}
-                                height={18}
-                                className={`transition-transform duration-200 ${mobileExpanded === 'account' ? "rotate-180" : ""
-                                    }`}
-                            />
-                        </button>
+                    {/* User Menu OR Sign In Button - Mobile */}
+                    {isLoggedIn ? (
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                            <button
+                                onClick={() => setMobileExpanded(mobileExpanded === 'account' ? null : 'account')}
+                                className="flex items-center justify-between w-full px-4 py-3 
+          font-avenir font-semibold text-[17px] text-[#21527D] 
+          bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors mb-2"
+                            >
+                                <span className="uppercase tracking-wider">Account</span>
+                                <DownArrowIcon
+                                    width={18}
+                                    height={18}
+                                    className={`transition-transform duration-200 ${mobileExpanded === 'account' ? "rotate-180" : ""
+                                        }`}
+                                />
+                            </button>
 
-                        {mobileExpanded === 'account' && (
-                            <div className="ml-4 space-y-1">
-                                {USER_MENU.map((item, index) => (
-                                    <div key={index}>
-                                        {item.action === "logout" ? (
-                                            <button
-                                                onClick={() => handleLogoutClick(true)}
-                                                className="flex items-center w-full px-4 py-3 font-avenir font-medium gap-3
-                                                text-[16px] text-[#464646] rounded-lg 
-                                                hover:bg-gray-100 transition-colors"
-                                            >
+                            {mobileExpanded === 'account' && (
+                                <div className="ml-4 space-y-1">
+                                    {USER_MENU.map((item, index) => (
+                                        <div key={index}>
+                                            {item.action === "logout" ? (
+                                                <button
+                                                    onClick={() => handleLogoutClick(true)}
+                                                    className="flex items-center w-full px-4 py-3 font-avenir font-medium gap-3
+                                                    text-[16px] text-[#464646] rounded-lg 
+                                                    hover:bg-gray-100 transition-colors"
+                                                >
 
-                                                {item.Icon && <item.Icon width={30} height={30} />}
-                                                <span className="font-avenir font-medium text-[20px] leading-[1.2] tracking-[0.04em] capitalize text-[#21527D]">
+                                                    {item.Icon && <item.Icon width={30} height={30} />}
+                                                    <span className="font-avenir font-medium text-[20px] leading-[1.2] tracking-[0.04em] capitalize text-[#21527D]">
+                                                        {item.label}
+                                                    </span>
+                                                </button>
+                                            ) : (
+                                                <Link
+                                                    to={item.to}
+                                                    className="block px-4 py-3 font-avenir font-medium 
+              text-[16px] text-[#464646] rounded-lg 
+              hover:bg-gray-100 transition-colors"
+                                                    onClick={closeMobileMenu}
+                                                >
                                                     {item.label}
-                                                </span>
-                                            </button>
-                                        ) : (
-                                            <Link
-                                                to={item.to}
-                                                className="block px-4 py-3 font-avenir font-medium 
-          text-[16px] text-[#464646] rounded-lg 
-          hover:bg-gray-100 transition-colors"
-                                                onClick={closeMobileMenu}
-                                            >
-                                                {item.label}
-                                            </Link>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                                                </Link>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col gap-3 pt-4">
+                            <Link
+                                to="/signin"
+                                className="w-full text-center font-avenir font-semibold text-[18px] text-[#21527D] border border-[#21527D] py-3 rounded-[10px]"
+                            >
+                                Sign In
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </div>
             {showLogoutPopup && (

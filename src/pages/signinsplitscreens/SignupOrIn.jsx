@@ -37,10 +37,13 @@ const SignupOrIn = () => {
           access_token: tokenResponse.access_token,
         });
 
-        const { email } = res.data;
+        const { email, userId } = res.data;
 
         localStorage.setItem("loginType", "google");
         localStorage.setItem("loginValue", email);
+        if (userId) {
+          localStorage.setItem("userId", userId);
+        }
 
         // 🔥 Always go to landing page
         navigate("/landingpage");
