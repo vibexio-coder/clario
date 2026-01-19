@@ -174,7 +174,7 @@ const Navbar = () => {
 
                     {/* Desktop Navigation */}
                     <div className="hidden lg:flex items-center justify-center flex-1">
-                        <div className="flex items-center justify-center space-x-6 xl:space-x-10">
+                        <div className="flex items-center justify-center space-x-2 xl:space-x-10">
                             {Object.keys(NAV_ITEMS).map((title) => (
                                 <div
                                     key={title}

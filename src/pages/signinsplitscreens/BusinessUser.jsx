@@ -36,11 +36,6 @@ const BusinessUser = () => {
             return "Organization name is required";
         }
 
-        // Check if contains only allowed characters
-        if (!/^[A-Za-z0-9&\s.,'-]+$/.test(trimmedName)) {
-            return "Organization name contains invalid characters";
-        }
-
         // Check if at least 2 characters
         if (trimmedName.length < 2) {
             return "Organization name must be at least 2 characters long";

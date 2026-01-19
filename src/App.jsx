@@ -1,5 +1,5 @@
-import React from "react";
-import { Route, Routes } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
 import LandingPage from "./pages/ocrscreens/LandingPage";
 import AccountPage from "./pages/ocrscreens/AccountPage";
 import OriginalExtractPage from "./pages/ocrscreens/OriginalExtractPage";
@@ -53,6 +53,11 @@ import ContactSales from "./pages/navigationpages/ContactSales";
 import Api from "./pages/navigationpages/Api";
 
 const App = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
   return (
     <div>
       <Routes>

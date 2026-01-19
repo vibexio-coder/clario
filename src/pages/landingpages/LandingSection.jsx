@@ -48,11 +48,11 @@ const LandingSection = () => {
     return (
         <div
             className="w-full flex justify-center items-center 
-                       bg-cover bg-center bg-no-repeat py-10">
+                       bg-cover bg-center bg-no-repeat py-0 lg:py-10">
             <div className="
                 w-full max-w-[900px] 
                 bg-[#FDFDFD] 
-                shadow-[0px_0px_22.8px_2px_#57575740]
+                lg:shadow-[0px_0px_22.8px_2px_#57575740]
                 md:rounded-[20px] 
                 flex flex-col items-center 
                 px-4 sm:px-6 md:px-10 

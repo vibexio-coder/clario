@@ -19,6 +19,12 @@ import SvgIcon from '../../assets/icons/uploadpage/SvgIcon';
 import Footer from '../landingpages/Footer';
 import Navbar from '../landingpages/Navbar';
 import DocIcon from '../../assets/icons/uploadpage/DocIcon';
+import { Document, Page, pdfjs } from "react-pdf";
+
+import "react-pdf/dist/Page/TextLayer.css";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+
+pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
 const OriginalExtractPage = () => {
     const [showExportPopup, setShowExportPopup] = useState(false);
@@ -34,6 +40,10 @@ const OriginalExtractPage = () => {
     const [exportData, setExportData] = useState(null);
     const [showFormatPopup, setShowFormatPopup] = useState(false);
 
+    // PDF State
+    const [pdfPages, setPdfPages] = useState({});
+    const [currentPdfPage, setCurrentPdfPage] = useState(1);
+
     // State for extracted section
     const [extractedZoom, setExtractedZoom] = useState(100);
 
@@ -47,6 +57,18 @@ const OriginalExtractPage = () => {
             u8arr[n] = bstr.charCodeAt(n);
         }
         return new File([u8arr], filename, { type: mimeType });
+    };
+
+    // Reset PDF page when file changes
+    useEffect(() => {
+        setCurrentPdfPage(1);
+    }, [currentFileIndex]);
+
+    const onPdfLoadSuccess = (numPages, fileId) => {
+        setPdfPages((prev) => ({
+            ...prev,
+            [fileId]: numPages,
+        }));
     };
 
     // Load files from uploadPageFiles (SINGLE SOURCE OF TRUTH)
@@ -213,32 +235,27 @@ const OriginalExtractPage = () => {
         } else if (currentFile.isPDF) {
             // For PDFs, show text content
             return (
-                <div className="h-full w-full flex flex-col">
-                    <div
-                        className="flex-1 overflow-auto scrollbar-hide"
-                        style={{
-                            transform: `rotate(${rotation}deg)`,
-                            transformOrigin: 'center center',
-                            transition: 'transform 0.3s ease'
-                        }}
+                <div className="h-full w-full overflow-hidden flex justify-center items-start"
+                    style={{
+                        transform: `rotate(${rotation}deg)`,
+                        transformOrigin: 'center center',
+                        transition: 'transform 0.3s ease'
+                    }}>
+                    <Document
+                        file={currentFile.file}
+                        onLoadSuccess={({ numPages }) => onPdfLoadSuccess(numPages, currentFile.id)}
+                        loading={<p className="text-center mt-10">Loading PDF...</p>}
+                        error={<p className="text-center text-red-500 mt-10">Failed to load PDF</p>}
+                        className="flex justify-center"
                     >
-                        <div
-                            style={{
-                                fontSize: `${originalZoom}%`,
-                                lineHeight: '1.5',
-                                padding: '10px',
-                                transition: 'font-size 0.3s ease'
-                            }}
-                            className='scrollbar-hide overflow-auto h-full'
-                        >
-                            <div className="text-gray-800">
-                                <p className="mb-3">PDF Document: {currentFile.name}</p>
-                                <p className="mb-3">This is the original content from the uploaded PDF file.</p>
-                                <p className="mb-3">Page 1 of {currentFile.pageCount || 1}</p>
-                                <p className="mb-3">File {currentFileIndex + 1} of {originalFiles.length}</p>
-                            </div>
-                        </div>
-                    </div>
+                        <Page
+                            pageNumber={currentPdfPage}
+                            width={400} // Adjust width as needed to fit container
+                            scale={originalZoom / 100}
+                            renderTextLayer={false}
+                            renderAnnotationLayer={false}
+                        />
+                    </Document>
                 </div>
             );
         }
@@ -459,7 +476,7 @@ const OriginalExtractPage = () => {
                                 </button>
                             </div>
 
-                            {/* Pagination Section */}
+                            {/* Pagination Section - Existing File Navigation (PRESERVED) */}
                             <div className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 border-r border-[#21527D]/20">
                                 <button
                                     onClick={handlePreviousFile}
@@ -483,6 +500,33 @@ const OriginalExtractPage = () => {
                                     <RightArrowIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                                 </button>
                             </div>
+
+                            {/* New PDF Page Pagination - Only visible for PDFs */}
+                            {currentFile && currentFile.isPDF && (
+                                <div className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 border-r border-[#21527D]/20">
+                                    <button
+                                        onClick={() => setCurrentPdfPage(prev => Math.max(1, prev - 1))}
+                                        disabled={currentPdfPage === 1}
+                                        className={currentPdfPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}
+                                    >
+                                        <LeftPaginationArrowIcon color="#000000" />
+                                    </button>
+                                    <div className="w-[20px] h-[20px] sm:w-[22px] sm:h-[22px] flex items-center justify-center rounded-[6px] sm:rounded-[8px] bg-[#FFFFFF] text-[#21527D] font-avenir font-black text-[12px] sm:text-[14px] leading-[100%] opacity-[0.70]">
+                                        {currentPdfPage}
+                                    </div>
+                                    <DiagonalSlashIcon className="w-4 h-4 sm:w-[18px] sm:h-[18px]" color="#21527D" />
+                                    <div className="font-avenir font-normal text-[14px] sm:text-[16px] leading-[100%] text-[#000000]">
+                                        {pdfPages[currentFile.id] || 1}
+                                    </div>
+                                    <button
+                                        onClick={() => setCurrentPdfPage(prev => Math.min(pdfPages[currentFile.id] || 1, prev + 1))}
+                                        disabled={currentPdfPage >= (pdfPages[currentFile.id] || 1)}
+                                        className={currentPdfPage >= (pdfPages[currentFile.id] || 1) ? 'opacity-50 cursor-not-allowed' : ''}
+                                    >
+                                        <RightArrowIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                                    </button>
+                                </div>
+                            )}
 
                             {/* Rotate Button */}
                             <div className="flex items-center gap-2 sm:gap-3 pl-3 sm:pl-4">

@@ -1,11 +1,12 @@
 import React from "react";
 import Navbar from "../landingpages/Navbar";
+import Footer from "../landingpages/Footer";
 
 const Customai = () => {
   return (
     <div>
       <Navbar />
-      <div className="w-full px-4 sm:px-6 lg:px-12 py-5 lg:py-10">
+      <div className="w-full px-4 sm:px-6 lg:px-30 xl:px-50 py-5 lg:py-10">
         <h1 className="font-['Kollektif'] font-bold text-[20px] sm:text-[22px] lg:text-[24px] leading-[100%] tracking-[0.02em] text-[#21527D] mb-3 sm:mb-4">
           Custom AI Workflows
         </h1>
@@ -31,6 +32,7 @@ const Customai = () => {
           continuous process improvement and digital transformation.
         </p>
       </div>
+      <Footer />
     </div>
   );
 };

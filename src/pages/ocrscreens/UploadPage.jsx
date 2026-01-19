@@ -39,7 +39,6 @@ const UploadPage = () => {
   const [zoomLevel, setZoomLevel] = useState(100);
   const [isCropping, setIsCropping] = useState(false);
   const [rotation, setRotation] = useState(0);
-  const [isTextDeleted, setIsTextDeleted] = useState(false);
   const [cropArea, setCropArea] = useState({
     x: 100,
     y: 100,
@@ -382,8 +381,6 @@ const UploadPage = () => {
 
   // ✅ Delete function (right side delete icon)
   const handleDelete = () => {
-    setIsTextDeleted(true);
-
     // If there's a current preview file, delete it
     if (currentPreviewFile) {
       handleDeleteFile(currentPreviewFile.id);
@@ -801,7 +798,7 @@ const UploadPage = () => {
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 xl:gap-20 px-0 xl:px-20">
           {/* Left Column */}
           <div className="lg:w-1/2 flex flex-col gap-6 md:gap-8">
-            <div className="bg-[#FDFDFD] rounded-[20px] shadow-[0px_3px_6.9px_2px_#6C5E5E26] p-5 h-[550px] flex flex-col overflow-hidden">
+            <div className="bg-[#FDFDFD] rounded-[20px] shadow-[0px_3px_6.9px_2px_#6C5E5E26] p-5 h-full lg:h-[550px] flex flex-col overflow-hidden">
               {/* Add Files Button */}
               <div className="flex justify-center mb-4">
                 <button
@@ -936,16 +933,10 @@ const UploadPage = () => {
                 ref={previewRef}
                 className="relative w-full h-[400px] lg:h-[310px] rounded-[25px] bg-[#FDFDFD] shadow-[0px_-2px_4px_0px_#21527D1A] p-4 overflow-hidden scrollbar-hide"
               >
-                {isTextDeleted ? (
-                  <div className="flex items-center justify-center h-full text-gray-400 italic">
-                    File has been deleted
-                  </div>
-                ) : (
-                  renderPreviewContent()
-                )}
+                {renderPreviewContent()}
 
                 {isCropping &&
-                  !isTextDeleted &&
+
                   currentPreviewFile &&
                   currentPreviewFile.file.type.startsWith("image/") && (
                     <div

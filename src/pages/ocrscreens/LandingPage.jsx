@@ -10,7 +10,7 @@ const LandingPage = () => {
             <div>
                 <Navbar />
             </div>
-            <div className='w-full px-4 sm:px-6 lg:px-0'>
+            <div className='w-full px-4 sm:px-6 md:px-0'>
                 <LandingSection />
             </div>
             <div className='w-full px-4 sm:px-6 lg:px-12 py-10'>

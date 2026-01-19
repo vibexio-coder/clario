@@ -1,11 +1,12 @@
 import React from "react";
 import Navbar from "../landingpages/Navbar";
+import Footer from "../landingpages/Footer";
 
 const Api = () => {
   return (
     <div>
       <Navbar />
-      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-12">
+      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-30 xl:px-50">
         <div className="text-center max-w-xl">
           {/* Icon */}
           <div className="flex justify-center mb-6">
@@ -31,6 +32,7 @@ const Api = () => {
           </p>
         </div>
       </div>
+      <Footer/>
     </div>
   );
 };

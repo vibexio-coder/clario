@@ -11,20 +11,21 @@ const ExtractingFilesPopup = ({ closePopup, fileCount = 0 }) => {
 
   const timeLeft = TOTAL_STEPS - percentage / 10;
 
+  // ⏱ Progress increment only
   useEffect(() => {
     const interval = setInterval(() => {
-      setPercentage((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          navigate("/originalextractPage");
-          return 100;
-        }
-        return prev + 10; // 10,20...100
-      });
+      setPercentage((prev) => Math.min(prev + 10, 100));
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [navigate]);
+  }, []);
+
+  // 🚀 Navigation side-effect (SEPARATE)
+  useEffect(() => {
+    if (percentage === 100) {
+      navigate("/originalextractPage");
+    }
+  }, [percentage, navigate]);
 
   return (
     <div
